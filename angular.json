@@ -119,6 +119,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "milan"
+    }
+  },
+  "defaultProject": "milan",
+  "cli": {
+    "analytics": "17b8f0ab-0665-43ef-82e3-0858f544a2a8"
+  }
 }
