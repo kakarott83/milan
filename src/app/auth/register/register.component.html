@@ -3,18 +3,18 @@
         <img class="mb-4" src="../assets/milan_logo.png" alt="" width="72" height="72">
         <h1 class="h3 mb-3 font-weight-normal">Registrieren</h1>
         <label for="inputFirstName" class="sr-only">FirstName</label>
-        <input type="input" id="inputEmail" class="form-control" placeholder="Vorname" required autofocus>
+        <input type="input" id="inputEmail" [(ngModel)]="user.firstname" name="firstname" class="form-control" placeholder="Vorname" required autofocus>
         <label for="inputLastName" class="sr-only">LastName</label>
-        <input type="input" id="inputEmail" class="form-control" placeholder="Nachname" required autofocus>
+        <input type="input" id="inputEmail" [(ngModel)]="user.name" name="name" class="form-control" placeholder="Nachname" required autofocus>
         <label for="inputEmail" class="sr-only">E-Mail</label>
-        <input type="email" id="inputEmail" class="form-control" placeholder="E-Mail" required autofocus>
+        <input type="email" id="inputEmail" [(ngModel)]="user.email" name="email" class="form-control" placeholder="E-Mail" required autofocus>
         <label for="inputPassword" class="sr-only">Password</label>
-        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        <input type="password" id="inputPassword" [(ngModel)]="user.password" name="password" class="form-control" placeholder="Password" required>
         <label for="inputPassword" class="sr-only">Password bestätigen</label>
         <input type="password" id="inputPassword" class="form-control" placeholder="Password bestätigen" required>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Registrieren <i class="fa fa-user-plus" aria-hidden="true"></i>
-
+        <button class="btn btn-lg btn-primary btn-block" (click)="onSubmit()" type="submit">Registrieren <i class="fa fa-user-plus" aria-hidden="true"></i>
         </button>
+        <a routerLink="/login">Zurück zum Login</a>   
         <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
     </form>
 </div>
