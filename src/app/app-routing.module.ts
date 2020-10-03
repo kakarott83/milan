@@ -7,13 +7,14 @@ import { ResetPasswordComponent } from './auth/reset-password/reset-password.com
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { StartComponent } from './start/start.component';
 
+import { AuthGuardService } from './services/auth-guard.service';
 
 const routes: Routes = [
   {path: 'start', component: StartComponent},
   {path: 'login', component: LoginComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'reset-password', component: ResetPasswordComponent},
-  {path: 'dashboard', component: DashboardComponent},
+  {path: 'dashboard', component: DashboardComponent, canActivate:[AuthGuardService]},
   {path: '', redirectTo: '/start', pathMatch: 'full'},
   {path: '**', component: StartComponent}
 

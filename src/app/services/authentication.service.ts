@@ -1,6 +1,8 @@
 import { ConstantPool } from '@angular/compiler';
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
+import { sign } from 'crypto';
+import * as firebase from 'firebase';
 import { error } from 'protractor';
 import { Observable } from 'rxjs'
 
@@ -10,6 +12,8 @@ import { Observable } from 'rxjs'
 export class AuthenticationService {
 
   userData: Observable<firebase.User>;
+  private loggedInStatus = JSON.parse(localStorage.getItem('loggedIn') || ('false'))
+
   constructor(
     private angularFireAuth: AngularFireAuth
   ) { 
@@ -28,15 +32,21 @@ export class AuthenticationService {
   }
 
   /*Login*/
-  Login(email: string, password: string) {
+  /*Login(email: string, password: string) {
     this.angularFireAuth.signInWithEmailAndPassword(email, password)
       .then(resp => {
-        console.log('erfolgreich eingeloggt')
+        console.log('erfolgreich eingeloggt', resp)
+        console.log(resp.user.uid)
       })
       .catch(error => {
         console.log('Fehler beim Login')
       })
   }
+  */
+ logInUser(email: string, password: string) {
+   return firebase.auth()
+   .signInWithEmailAndPassword(email, password)
+ }
 
   /*Reset Password*/
   ResetPassword(email: string) {
@@ -47,6 +57,16 @@ export class AuthenticationService {
       .catch(error => {
         console.log('Fehler beim Passwort zurücksetzen')
       })
+  }
+
+  /*setLogInStatus*/
+  setLoginStatus(value) {
+    this.loggedInStatus = value;
+    localStorage.setItem('loggedIn', 'true')
+  }
+
+  get LoginStatus() {
+    return JSON.parse(localStorage.getItem('loggedIn') || this.loggedInStatus.toString());
   }
 
   /* LogOut */
