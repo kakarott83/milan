@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Form } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { User } from 'src/app/class/user';
+
+import { AuthenticationService } from 'src/app/services/authentication.service'
 
 
 @Component({
@@ -15,7 +16,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private auth: AuthenticationService
 
   ) { }
 
@@ -24,6 +26,9 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
     //console.log(this.user);
+    this.auth.Login(this.user.email, this.user.password)
+    this.user.email = '';
+    this.user.password = ''
     this.router.navigate([`../dashboard`])
   }
 
