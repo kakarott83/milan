@@ -8,7 +8,9 @@
         <input type="password" id="inputPassword" [(ngModel)]="user.password" name="password" class="form-control" placeholder="Password" required>
         <button class="btn btn-lg btn-primary btn-block" (click)="onSubmit()" type="submit">Login <i class="fa fa-sign-in" aria-hidden="true"></i>
         </button>
+        <div class="loginError">{{error}}</div>
         <a routerLink="/reset-password">Passwort vergessen</a>    
         <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
+
     </form>
 </div>

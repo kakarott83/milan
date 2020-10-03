@@ -17,13 +17,14 @@ export class AuthGuardService implements CanActivate, CanActivateChild {
   canActivate(route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): boolean | UrlTree | Observable<boolean | UrlTree> | Promise<boolean | UrlTree> 
     {
-      if(this.auth.LoginStatus) {
-        this.router.navigate([`/dashboard`])
+      if(!this.auth.LoginStatus) {
+        this.router.navigate([`login`])
       }
-    throw new Error('Method not implemented.');
+    return this.auth.LoginStatus;
   }
 
-  canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree | Observable<boolean | UrlTree> | Promise<boolean | UrlTree> {
-    throw new Error('Method not implemented.');
+  canActivateChild(childRoute: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): boolean | UrlTree | Observable<boolean | UrlTree> | Promise<boolean | UrlTree> {
+    return this.canActivate(childRoute, state)
   }
 }

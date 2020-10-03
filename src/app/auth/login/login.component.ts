@@ -18,6 +18,7 @@ export class LoginComponent implements OnInit {
   isLoading = false;
 
 
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -41,6 +42,7 @@ export class LoginComponent implements OnInit {
       console.log(resp.user);
       this.isLoading = false;
       this.auth.setLoginStatus(true);
+      console.log('LoginComponenet')
       this.router.navigate([`/dashboard`])
     })
     .catch(error => {
