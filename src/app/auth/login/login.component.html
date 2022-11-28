@@ -1,0 +1,43 @@
+<div class="container text-center">
+  <mat-card class="card m-auto w-100">
+    <mat-card-header class="header">
+      <img src="../../../assets/picture/milan_logo.png" alt="" />
+      <h2>Sign In</h2>
+    </mat-card-header>
+    <mat-card-content class="content">
+      <form class="form" [formGroup]="loginForm" (ngSubmit)="submit()">
+        <mat-form-field class="example-full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="userEmail" />
+          <mat-error *ngIf="loginForm.get('userEmail')?.hasError('required')"
+            ><strong>Name ist Pflichtfeld!</strong></mat-error
+          >
+        </mat-form-field>
+        <mat-form-field class="example-full-width">
+          <mat-label>Passwort</mat-label>
+          <input type="password" matInput formControlName="userPassword" />
+          <mat-error *ngIf="loginForm.get('userPassword')?.hasError('required')"
+            ><strong>Passwort ist Pflichtfeld!</strong></mat-error
+          >
+        </mat-form-field>
+        <button
+          type="submit"
+          mat-raised-button
+          color="primary"
+          [disabled]="loginForm.invalid"
+        >
+          <mat-icon>login</mat-icon>Login
+        </button>
+        <div class="text-or">
+          <span><strong>OR</strong></span>
+        </div>
+        <button type="submit" mat-raised-button color="primary">
+          <mat-icon>login</mat-icon>Login with Google
+        </button>
+        <span class="text-registerLink" [routerLink]="['/auth/register']">
+          Klick hier zum registrieren</span
+        >
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
