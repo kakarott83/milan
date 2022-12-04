@@ -10,12 +10,21 @@ import { BusinessAppComponent } from './business-app.component';
 import { CreateOrUpdateTravelComponent } from './create-or-update-travel/create-or-update-travel.component';
 import { HomeComponent } from './home/home.component';
 import { TravelListComponent } from './travel-list/travel-list.component';
+import { UserComponent } from './user/user.component';
+import { WorktimeComponent } from './worktime/worktime.component';
 
 const routes: Routes = [
   {
     path: '',
     component: BusinessAppComponent,
-    children: [{ path: 'home', component: HomeComponent }],
+    children: [
+      { path: 'home', component: HomeComponent },
+      { path: 'worktime', component: WorktimeComponent },
+      { path: 'createTravel', component: CreateOrUpdateTravelComponent },
+      { path: 'updateTravel/:id', component: CreateOrUpdateTravelComponent },
+      { path: 'user', component: UserComponent },
+      { path: 'travel-list', component: TravelListComponent },
+    ],
   },
 ];
 
@@ -27,6 +36,8 @@ const routes: Routes = [
     HomeComponent,
     SidenavComponent,
     ToolbarComponent,
+    UserComponent,
+    WorktimeComponent,
   ],
   imports: [
     CommonModule,

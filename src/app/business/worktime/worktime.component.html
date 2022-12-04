@@ -1,0 +1,85 @@
+<div class="container">
+  <form [formGroup]="workTimeForm" (ngSubmit)="submit($event)">
+    <div class="row">
+      <div class="col mb-6">
+        <mat-card class="calendar">
+          <mat-calendar
+            [(selected)]="selected"
+            (dateChange)="addEvent($event)"
+          ></mat-calendar>
+        </mat-card>
+      </div>
+      <div class="col mb-6">
+        <div class="selected-Date">
+          {{ selected | date : "d MMMM yyyy" }}
+        </div>
+
+        <mat-form-field class="full-width">
+          <mat-label>Beginn</mat-label>
+          <input
+            matInput
+            name="selected_time_B"
+            [format]="24"
+            formControlName="wtStart"
+            [ngxMatTimepicker]="pickerStart"
+            placeholder="Beginn"
+          />
+          <mat-icon matSuffix (click)="pickerStart.open()"> schedule </mat-icon>
+        </mat-form-field>
+        <ngx-mat-timepicker
+          color="primary"
+          #pickerStart
+          (closed)="updateTime($event)"
+        ></ngx-mat-timepicker>
+
+        <mat-form-field class="full-width">
+          <mat-label>Ende</mat-label>
+          <input
+            matInput
+            name="selected_time_B"
+            [format]="24"
+            formControlName="wtEnd"
+            [ngxMatTimepicker]="pickerEnd"
+            placeholder="Ende"
+            readonly
+          />
+          <mat-icon matSuffix (click)="pickerEnd.open()"> schedule </mat-icon>
+        </mat-form-field>
+        <ngx-mat-timepicker
+          color="primary"
+          #pickerEnd
+          (closed)="updateTime($event)"
+        ></ngx-mat-timepicker>
+
+        <mat-form-field class="full-width">
+          <mat-label>Pause</mat-label>
+          <input
+            matInput
+            type="time"
+            formControlName="wtBreak"
+            (change)="updateTime($event)"
+          />
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <mat-label>Kommentar</mat-label>
+          <textarea type="date" matInput formControlName="wtComment"></textarea>
+        </mat-form-field>
+
+        <div class="duration">
+          Dauer: <span>{{ wtDuration }}</span> Stunden
+        </div>
+      </div>
+    </div>
+    <div class="row btn-submit">
+      <button
+        type="submit"
+        class="full-width"
+        mat-raised-button
+        color="primary"
+      >
+        <mat-icon>save</mat-icon>Speichern
+      </button>
+    </div>
+  </form>
+</div>

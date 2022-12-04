@@ -5,6 +5,7 @@ import {
 	FormGroup,
 	Validators,
 } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import { EmailValidation, PasswordValidation } from '../validators';
 
@@ -16,7 +17,7 @@ import { EmailValidation, PasswordValidation } from '../validators';
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
     this.loginForm = this.fb.group({
       userEmail: new FormControl('', EmailValidation),
       userPassword: new FormControl('', PasswordValidation),
@@ -25,5 +26,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  submit() {}
+  submit() {
+    this.router.navigate(['/business/home']);
+  }
 }

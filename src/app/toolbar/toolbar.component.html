@@ -1,10 +1,21 @@
 <mat-toolbar color="primary">
-  <button mat-button class="sidenav-toggle" (click)="toggleSidenav.emit()">
-    <mat-icon>menu</mat-icon>
-  </button>
-
-  <span class="spacer">Reisekosten</span>
-  <button mat-button>
-    <mat-icon>logout</mat-icon>
-  </button>
+  <div class="container-fluid">
+    <!--ToDo Small Size-->
+    <button mat-button class="sidenav-toggle" (click)="toggleSidenav.emit()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <div class="toolbar-top">
+      <div>
+        <span>Reisekosten</span>
+      </div>
+      <div class="btn-right">
+        <button mat-button [routerLink]="['/business/user']">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <button mat-button>
+          <mat-icon>logout</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
 </mat-toolbar>

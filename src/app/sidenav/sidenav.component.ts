@@ -14,11 +14,21 @@ export class SidenavComponent implements OnInit {
   public isScreenSmall!: boolean;
 
   public sideNacActions = [
-    { action: 'worktime', path: '', display: 'Arbeitszeit', icon: 'schedule' },
-    { action: 'newTravel', path: '', display: 'Neue Reise', icon: 'luggage' },
+    {
+      action: 'worktime',
+      path: '/business/worktime',
+      display: 'Arbeitszeit',
+      icon: 'schedule',
+    },
+    {
+      action: 'newTravel',
+      path: '/business/createTravel',
+      display: 'Neue Reise',
+      icon: 'luggage',
+    },
     {
       action: 'allTravels',
-      path: '',
+      path: '/business/travel-list',
       display: 'Alle Reisen',
       icon: 'format_list_bulleted',
     },
@@ -27,6 +37,12 @@ export class SidenavComponent implements OnInit {
       path: '',
       display: 'Neuer Kunde',
       icon: 'person_add',
+    },
+    {
+      action: 'user',
+      path: '/business/user',
+      display: 'User',
+      icon: 'account_circle',
     },
   ];
 

@@ -1,0 +1,40 @@
+<div class="container">
+  <form [formGroup]="userForm" (ngSubmit)="submit($event)">
+    <div>
+      <div class="column">
+        <mat-form-field class="full-width">
+          <mat-label>Id</mat-label>
+          <input matInput formControlName="userId" />
+        </mat-form-field>
+      </div>
+      <div class="column">
+        <mat-form-field class="full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="userName" />
+        </mat-form-field>
+      </div>
+      <div class="column">
+        <mat-form-field class="full-width">
+          <mat-label>angemeldet seit</mat-label>
+          <input type="date" matInput formControlName="signSince" />
+        </mat-form-field>
+      </div>
+      <div class="column">
+        <mat-form-field class="full-width">
+          <mat-label>E-Mail</mat-label>
+          <input matInput formControlName="userEmail" />
+        </mat-form-field>
+      </div>
+      <div class="column">
+        <button
+          type="submit"
+          class="full-width"
+          mat-raised-button
+          color="primary"
+        >
+          <mat-icon>save</mat-icon>Speichern
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

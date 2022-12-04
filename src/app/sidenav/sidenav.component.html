@@ -7,9 +7,9 @@
   >
     <mat-toolbar color="primary"> Aktionen </mat-toolbar>
     <mat-nav-list *ngFor="let action of sideNacActions">
-      <mat-list-item>
+      <mat-list-item [routerLink]="[action.path]">
         <mat-icon matListItemIcon>{{ action.icon }}</mat-icon>
-        <div matListItemTitle>
+        <div class="item" matListItemTitle>
           {{ action.display }}
         </div>
       </mat-list-item>

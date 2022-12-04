@@ -1,3 +1,6 @@
+import { NgxMatTimepickerModule } from 'ngx-mat-timepicker';
+import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
+
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -46,6 +49,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatDatepickerModule,
     MatNativeDateModule,
     MatSnackBarModule,
+    NgxMaterialTimepickerModule,
+    NgxMatTimepickerModule,
   ],
 })
 export class MaterialModule {}

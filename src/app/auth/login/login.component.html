@@ -6,26 +6,21 @@
     </mat-card-header>
     <mat-card-content class="content">
       <form class="form" [formGroup]="loginForm" (ngSubmit)="submit()">
-        <mat-form-field class="example-full-width">
-          <mat-label>Name</mat-label>
+        <mat-form-field>
+          <mat-label>E-Mail</mat-label>
           <input matInput formControlName="userEmail" />
           <mat-error *ngIf="loginForm.get('userEmail')?.hasError('required')"
-            ><strong>Name ist Pflichtfeld!</strong></mat-error
+            ><strong>E-Mail ist Pflichtfeld!</strong></mat-error
           >
         </mat-form-field>
-        <mat-form-field class="example-full-width">
+        <mat-form-field>
           <mat-label>Passwort</mat-label>
           <input type="password" matInput formControlName="userPassword" />
           <mat-error *ngIf="loginForm.get('userPassword')?.hasError('required')"
             ><strong>Passwort ist Pflichtfeld!</strong></mat-error
           >
         </mat-form-field>
-        <button
-          type="submit"
-          mat-raised-button
-          color="primary"
-          [disabled]="loginForm.invalid"
-        >
+        <button type="submit" mat-raised-button color="primary">
           <mat-icon>login</mat-icon>Login
         </button>
         <div class="text-or">
