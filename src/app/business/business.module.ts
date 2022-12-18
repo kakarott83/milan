@@ -12,6 +12,8 @@ import { HomeComponent } from './home/home.component';
 import { TravelListComponent } from './travel-list/travel-list.component';
 import { UserComponent } from './user/user.component';
 import { WorktimeComponent } from './worktime/worktime.component';
+import { SpendsDialogComponent } from './create-or-update-travel/spendDialog/spends-dialog/spends-dialog.component';
+import { SpendListComponent } from './spend-list/spend-list.component';
 
 const routes: Routes = [
   {
@@ -38,6 +40,8 @@ const routes: Routes = [
     ToolbarComponent,
     UserComponent,
     WorktimeComponent,
+    SpendsDialogComponent,
+    SpendListComponent,
   ],
   imports: [
     CommonModule,

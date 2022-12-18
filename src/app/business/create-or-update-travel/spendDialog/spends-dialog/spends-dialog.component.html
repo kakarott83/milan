@@ -1,0 +1,55 @@
+<div class="container">
+  <h2 mat-dialog-title>Ausgaben</h2>
+  <mat-dialog-content>
+    <form [formGroup]="form">
+      <mat-form-field class="full-width">
+        <mat-label>Typ</mat-label>
+        <mat-select #spendType name="type" formControlName="type">
+          <mat-option *ngFor="let type of spendTypes" [value]="type">
+            {{ type }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field
+        *ngIf="spendType.value === 'Sonstiges'"
+        class="full-width"
+      >
+        <textarea matInput name="text" formControlName="text"></textarea>
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <mat-label>Datum</mat-label>
+        <input
+          matInput
+          [matDatepicker]="spendDate"
+          formControlName="date"
+          placeholder="dd.MM.yyyy"
+        />
+        <mat-datepicker-toggle
+          matIconSuffix
+          [for]="spendDate"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #spendDate></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Betrag</mat-label>
+        <input
+          matInput
+          placeholder="Betrag"
+          appearance="fill"
+          formControlName="value"
+        />
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-raised-button (click)="dialogRef.close(false)" color="danger">
+      Close
+    </button>
+    <button mat-raised-button color="primary" (click)="submit(form.value)">
+      Submit
+    </button>
+  </mat-dialog-actions>
+</div>
