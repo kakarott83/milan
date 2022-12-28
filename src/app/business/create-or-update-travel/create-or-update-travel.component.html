@@ -1,179 +1,257 @@
 <div class="container">
-  <form [formGroup]="myTravelForm" (ngSubmit)="submitTravel($event)">
-    <div class="row">
-      <div class="col">
-        <mat-form-field class="full-width">
-          <mat-label>Beginn der Reise</mat-label>
-          <input
-            matInput
-            [matDatepicker]="pickerDateStart"
-            formControlName="start"
-          />
-          <mat-hint>MM/DD/YYYY</mat-hint>
-          <mat-datepicker-toggle
-            matIconSuffix
-            [for]="pickerDateStart"
-          ></mat-datepicker-toggle>
-          <mat-datepicker #pickerDateStart></mat-datepicker>
-        </mat-form-field>
-      </div>
-      <div class="col">
-        <mat-form-field class="full-width">
-          <mat-label>Uhrzeit</mat-label>
-          <input
-            matInput
-            name="selected_time_B"
-            [format]="24"
-            formControlName="startTime"
-            [ngxMatTimepicker]="pickerTimeStart"
-            placeholder="Ende"
-            readonly
-          />
-          <mat-icon matSuffix (click)="pickerTimeStart.open()">
-            schedule
-          </mat-icon>
-        </mat-form-field>
-        <ngx-mat-timepicker
-          color="primary"
-          #pickerTimeStart
-          (closed)="updateTime($event, start)"
-        ></ngx-mat-timepicker>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <mat-form-field class="full-width">
-          <mat-label>Ende der Reise</mat-label>
-          <input
-            matInput
-            [matDatepicker]="pickerDateEnd"
-            formControlName="end"
-          />
-          <mat-hint>MM/DD/YYYY</mat-hint>
-          <mat-datepicker-toggle
-            matIconSuffix
-            [for]="pickerDateEnd"
-          ></mat-datepicker-toggle>
-          <mat-datepicker #pickerDateEnd></mat-datepicker>
-        </mat-form-field>
-      </div>
-      <div class="col">
-        <mat-form-field class="full-width">
-          <mat-label>Uhrzeit</mat-label>
-          <input
-            matInput
-            name="selected_time_B"
-            [format]="24"
-            formControlName="endTime"
-            [ngxMatTimepicker]="pickerTimeEnd"
-            placeholder="Ende"
-            readonly
-          />
-          <mat-icon matSuffix (click)="pickerTimeEnd.open()">
-            schedule
-          </mat-icon>
-        </mat-form-field>
-        <ngx-mat-timepicker
-          color="primary"
-          #pickerTimeEnd
-          (closed)="updateTime($event, 'end')"
-        ></ngx-mat-timepicker>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <mat-form-field class="full-width">
-          <mat-label>Kunde</mat-label>
-          <input
-            type="text"
-            placeholder="Pick one"
-            aria-label="Number"
-            matInput
-            formControlName="selectCustomer"
-            [matAutocomplete]="auto"
-          />
-          <mat-autocomplete
-            autoActiveFirstOption
-            #auto="matAutocomplete"
-            [displayWith]="displayFn"
-          >
-            <mat-option
-              *ngFor="let customer of customerList"
-              [value]="customer"
-            >
-              {{ customer.name }}
-            </mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
-      </div>
-      <div class="col">
-        <mat-form-field class="full-width">
-          <mat-label>Stadt</mat-label>
-          <input type="text" matInput [value]="city" />
-        </mat-form-field>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <div formArrayName="spends">
-          <div *ngFor="let spend of spends.controls; let i = index">
-            <div [formGroupName]="i">
-              <div class="row">
-                <div class="col">
-                  <mat-form-field class="full-width">
-                    <mat-label>Id</mat-label>
-                    <input type="number" matInput [value]="i" />
-                  </mat-form-field>
-                </div>
+  <div class="row">
+    <div class="col-md-9">
+      <form
+        [formGroup]="myTravelForm"
+        #myTravel
+        (ngSubmit)="submitTravel($event)"
+      >
+        <div class="row">
+          <div class="col">
+            <mat-form-field class="full-width">
+              <mat-label>Beginn der Reise</mat-label>
+              <input
+                matInput
+                [matDatepicker]="pickerDateStart"
+                formControlName="start"
+              />
+              <mat-hint>MM/DD/YYYY</mat-hint>
+              <mat-datepicker-toggle
+                matIconSuffix
+                [for]="pickerDateStart"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerDateStart></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div class="col">
+            <mat-form-field class="full-width">
+              <mat-label>Uhrzeit</mat-label>
+              <input
+                matInput
+                name="selected_time_B"
+                [format]="24"
+                formControlName="startTime"
+                [ngxMatTimepicker]="pickerTimeStart"
+                placeholder="Ende"
+                readonly
+              />
+              <mat-icon matSuffix (click)="pickerTimeStart.open()">
+                schedule
+              </mat-icon>
+            </mat-form-field>
+            <ngx-mat-timepicker
+              color="primary"
+              #pickerTimeStart
+              (closed)="updateTime($event, start)"
+            ></ngx-mat-timepicker>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <mat-form-field class="full-width">
+              <mat-label>Ende der Reise</mat-label>
+              <input
+                matInput
+                [matDatepicker]="pickerDateEnd"
+                formControlName="end"
+              />
+              <mat-hint>MM/DD/YYYY</mat-hint>
+              <mat-datepicker-toggle
+                matIconSuffix
+                [for]="pickerDateEnd"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #pickerDateEnd></mat-datepicker>
+            </mat-form-field>
+          </div>
+          <div class="col">
+            <mat-form-field class="full-width">
+              <mat-label>Uhrzeit</mat-label>
+              <input
+                matInput
+                name="selected_time_B"
+                [format]="24"
+                formControlName="endTime"
+                [ngxMatTimepicker]="pickerTimeEnd"
+                placeholder="Ende"
+                readonly
+              />
+              <mat-icon matSuffix (click)="pickerTimeEnd.open()">
+                schedule
+              </mat-icon>
+            </mat-form-field>
+            <ngx-mat-timepicker
+              color="primary"
+              #pickerTimeEnd
+              (closed)="updateTime($event, 'end')"
+            ></ngx-mat-timepicker>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <mat-form-field class="full-width">
+              <mat-label>Kunde</mat-label>
+              <input
+                type="text"
+                placeholder="Pick one"
+                aria-label="Number"
+                matInput
+                formControlName="selectCustomer"
+                [matAutocomplete]="auto"
+              />
+              <mat-autocomplete
+                autoActiveFirstOption
+                #auto="matAutocomplete"
+                [displayWith]="displayFn"
+              >
+                <mat-option
+                  *ngFor="let customer of customerList"
+                  [value]="customer"
+                >
+                  {{ customer.name }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+          <div class="col">
+            <mat-form-field class="full-width">
+              <mat-label>Stadt</mat-label>
+              <input type="text" matInput [value]="city" />
+            </mat-form-field>
+          </div>
+          <div class="col">
+            <mat-form-field class="full-width">
+              <mat-label>Grund</mat-label>
+              <mat-select formControlName="reason">
+                <mat-option *ngFor="let reason of reasons" [value]="reason">
+                  {{ reason }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="row">
+            <section class="checkbox-section">
+              <mat-checkbox color="primary" formControlName="breakfast">
+                <div>Frühstück</div>
+              </mat-checkbox>
+              <mat-checkbox color="primary" formControlName="launch">
+                <div>Mittagessen</div>
+              </mat-checkbox>
+              <mat-checkbox color="primary" formControlName="dinner"
+                ><div>Abendessen</div></mat-checkbox
+              >
+            </section>
+          </div>
+          <mat-divider></mat-divider>
+        </div>
+        <br />
+        <div class="row">
+          <div class="col">
+            <div formArrayName="spends">
+              <div *ngFor="let spend of spends.controls; let i = index">
+                <div [formGroupName]="i">
+                  <div class="row">
+                    <!--div class="col">
+                      <mat-form-field class="full-width">
+                        <mat-label>Id</mat-label>
+                        <input type="number" matInput [value]="i" />
+                      </mat-form-field>
+                    </div-->
 
-                <div class="col">
-                  <mat-form-field class="full-width">
-                    <mat-label>Typ</mat-label>
-                    <input type="string" matInput formControlName="type" />
-                  </mat-form-field>
-                </div>
-                <div class="col">
-                  <mat-form-field class="full-width">
-                    <input
-                      matInput
-                      [matDatepicker]="spendDate"
-                      formControlName="date"
-                    />
-                    <mat-hint>MM/DD/YYYY</mat-hint>
-                    <mat-datepicker-toggle
-                      matIconSuffix
-                      [for]="spendDate"
-                    ></mat-datepicker-toggle>
-                    <mat-datepicker #spendDate></mat-datepicker>
-                  </mat-form-field>
-                </div>
+                    <div class="col">
+                      <mat-form-field class="full-width">
+                        <mat-label>Typ</mat-label>
+                        <input type="string" matInput formControlName="type" />
+                      </mat-form-field>
+                    </div>
+                    <div class="col">
+                      <mat-form-field class="full-width">
+                        <input
+                          matInput
+                          [matDatepicker]="spendDate"
+                          formControlName="date"
+                        />
+                        <mat-hint>MM/DD/YYYY</mat-hint>
+                        <mat-datepicker-toggle
+                          matIconSuffix
+                          [for]="spendDate"
+                        ></mat-datepicker-toggle>
+                        <mat-datepicker #spendDate></mat-datepicker>
+                      </mat-form-field>
+                    </div>
 
-                <div class="col">
-                  <mat-form-field class="full-width">
-                    <mat-label>Betrag</mat-label>
-                    <input type="number" matInput formControlName="value" />
-                  </mat-form-field>
+                    <div class="col">
+                      <mat-form-field class="full-width">
+                        <mat-label>Betrag</mat-label>
+                        <input type="number" matInput formControlName="value" />
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-1">
+                      <button
+                        class="full-width"
+                        mat-icon-button
+                        (click)="removeSpend(i)"
+                      >
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+            <button mat-raised-button (click)="openDialog()">
+              <mat-icon>add</mat-icon>Neue Ausgaben
+            </button>
           </div>
         </div>
-        <button mat-raised-button (click)="openDialog()">
-          <mat-icon>add</mat-icon>Neue Ausgaben
-        </button>
-      </div>
+        <div class="row btn-submit">
+          <button
+            type="submit"
+            class="full-width"
+            (click)="submitTravel($event)"
+            mat-raised-button
+            color="primary"
+          >
+            <mat-icon>save</mat-icon>Speichern
+          </button>
+        </div>
+      </form>
     </div>
-    <div class="row btn-submit">
-      <button
-        type="submit"
-        class="full-width"
-        mat-raised-button
-        color="primary"
-      >
-        <mat-icon>save</mat-icon>Speichern
-      </button>
+    <div class="col">
+      <mat-card>
+        <mat-card-header>
+          <h2>Information</h2>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="card-info">
+            <div class="duration">
+              {{ durDays }} Tag(e) {{ durHours }} Stunden
+            </div>
+            <mat-divider></mat-divider>
+            <mat-grid-list cols="2" rowHeight="3:1">
+              <mat-grid-tile>
+                <div class="list-title">Pauschale</div>
+              </mat-grid-tile>
+              <mat-grid-tile>
+                <div class="list-value">{{ rate }}</div>
+              </mat-grid-tile>
+              <mat-grid-tile
+                ><div class="list-title">Ausgaben</div></mat-grid-tile
+              >
+              <mat-grid-tile>
+                <div class="list-value">{{ spendValue }}</div>
+              </mat-grid-tile>
+              <mat-grid-tile
+                ><div class="list-title">
+                  <b>Gesamt</b>
+                </div></mat-grid-tile
+              >
+              <mat-grid-tile><div class="list-value">400€</div></mat-grid-tile>
+            </mat-grid-list>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
-  </form>
-  <div>{{ myTravelForm }}</div>
+  </div>
   <div>Valid {{ myTravelForm.valid }}</div>
 </div>

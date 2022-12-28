@@ -2,6 +2,7 @@ input,
 button,
 mat-label,
 h2,
+div,
 span {
   font-family: "Ubuntu", sans-serif;
   font-weight: 700;
@@ -22,4 +23,28 @@ span {
 ::ng-deep .mat-mdc-form-field {
   justify-content: center;
   font-family: "Ubuntu", sans-serif;
+}
+
+::ng-deep .mat-mdc-card {
+  height: 100%;
+}
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.list-title {
+  width: 100%;
+}
+
+.list-value {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.checkbox-section {
+  display: flex;
+  justify-content: space-between;
 }

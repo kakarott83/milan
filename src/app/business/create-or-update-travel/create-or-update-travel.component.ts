@@ -18,12 +18,27 @@ import { Travel } from '../../models/travel';
 import { SpendsDialogComponent } from './spendDialog/spends-dialog/spends-dialog.component';
 
 const customer = [
-  { id: '4711', city: 'Horgen', name: 'Bank-now', country: {} },
-  { id: '4712', city: 'Linz', name: 'Oberbank', country: {} },
-  { id: '4713', city: 'Grünwald', name: 'AIL', country: {} },
+  {
+    id: '4711',
+    city: 'Horgen',
+    name: 'Bank-now',
+    country: { name: 'Schweiz', rate: 64, halfRate: 32 },
+  },
+  {
+    id: '4712',
+    city: 'Linz',
+    name: 'Oberbank',
+    country: { name: 'Österreich', rate: 24, halfRate: 12 },
+  },
+  {
+    id: '4713',
+    city: 'Grünwald',
+    name: 'AIL',
+    country: { name: 'Deutschland', rate: 24, halfRate: 12 },
+  },
 ];
 
-const reason = ['Vor Ort Betreuung', 'Livegang', 'Präsentation'];
+const reasons = ['Vor Ort Betreuung', 'Livegang', 'Präsentation'];
 
 export interface DialogData {
   spendType: string;
@@ -39,10 +54,16 @@ export interface DialogData {
 export class CreateOrUpdateTravelComponent implements OnInit {
   myTravelForm: FormGroup;
   myTravel!: Travel;
+  mySpends: Spend[] = [{}];
   customerList: Customer[] = customer;
   filteredCustomer!: Observable<Customer[]>;
   city: string = '';
   dataFromDialog: any;
+  reasons = reasons;
+  durDays: any;
+  durHours: any;
+  rate = 0;
+  spendValue = 0;
 
   constructor(
     private router: Router,
@@ -51,13 +72,16 @@ export class CreateOrUpdateTravelComponent implements OnInit {
   ) {
     this.myTravel = {};
     this.myTravelForm = this.fb.group({
-      start: new FormControl(''),
+      start: new FormControl<Date>(new Date()),
       startTime: new FormControl(''),
       end: new FormControl(''),
       endTime: new FormControl(''),
       reason: new FormControl(''),
       selectCustomer: new FormControl(''),
       spends: this.fb.array([]),
+      breakfast: new FormControl(true),
+      launch: new FormControl(false),
+      dinner: new FormControl(false),
     });
 
     this.onChanges();
@@ -67,7 +91,7 @@ export class CreateOrUpdateTravelComponent implements OnInit {
     return this.myTravelForm.get('start')?.value;
   }
 
-  get startTime() {
+  get startTime(): string {
     return this.myTravelForm.get('startTime')?.value;
   }
 
@@ -87,19 +111,43 @@ export class CreateOrUpdateTravelComponent implements OnInit {
     return this.myTravelForm.get('selectCustomer')?.value;
   }
 
+  get selectCity() {
+    return this.selectCustomer.city;
+  }
+
   get spends() {
     return this.myTravelForm.get('spends') as FormArray;
+  }
+
+  get breakfast() {
+    return this.myTravelForm.get('breakfast')?.value;
+  }
+
+  get launch() {
+    return this.myTravelForm.get('launch')?.value;
+  }
+
+  get dinner() {
+    return this.myTravelForm.get('dinner')?.value;
   }
 
   get isValid() {
     return this.myTravelForm.valid;
   }
 
-  ngOnInit(): void {}
-
-  submitTravel(event: any) {
-    console.log(event);
+  ngOnInit(): void {
+    console.log(this.myTravelForm.value, 'Init');
+    if (
+      this.start !== '' &&
+      this.end !== '' &&
+      this.startTime !== '' &&
+      this.endTime !== ''
+    ) {
+      console.log('Empty');
+    }
   }
+
+  submitTravel(event: any) {}
 
   onChanges() {
     this.myTravelForm.valueChanges.subscribe((val) => {
@@ -133,49 +181,45 @@ export class CreateOrUpdateTravelComponent implements OnInit {
   }
 
   setValue() {
-    let start = new Date();
-    let end = new Date();
-
-    let s = new Date(moment(this.start).format('YYYY-MM-DD'));
-    let e = new Date(moment(this.end).format('YYYY-MM-DD'));
-
-    if (this.startTime !== '') {
-      let sSplit = Helpers.splitTime(this.startTime);
-      if (sSplit !== undefined && sSplit.length > 0) {
-        s.setHours(Number(sSplit[0]));
-        s.setMinutes(Number(sSplit[1]));
-      }
+    if (this.selectCustomer) {
+      this.city = this.selectCity;
     }
 
-    if (this.endTime !== '') {
-      let eSplit = Helpers.splitTime(this.endTime);
-      if (eSplit !== undefined && eSplit.length > 0) {
-        e.setHours(Number(eSplit[0]));
-        e.setMinutes(Number(eSplit[1]));
-      }
-    }
+    /*ToDo Summieren*/
+    this.mySpends = this.spends.value;
+    let v = 0;
+    this.mySpends.forEach((x) => (v += x.value !== undefined ? x.value : 0));
+    this.spendValue = v;
 
-    if (s instanceof Date) {
-      start = s;
-    }
+    if (
+      this.start !== '' &&
+      this.end !== '' &&
+      this.startTime !== '' &&
+      this.endTime !== ''
+    ) {
+      let s = this.start as Date;
+      let e = this.end as Date;
+      let tStartSplit = this.startTime.split(':');
+      let tEndSplit = this.endTime.split(':');
+      s.setHours(Number(tStartSplit[0]), Number(tStartSplit[1]), 0);
+      e.setHours(Number(tEndSplit[0]), Number(tEndSplit[1]), 0);
 
-    if (e instanceof Date) {
-      end = e;
-    }
+      let mStart = moment(s, 'DD-MM-YYYY hh:mm');
+      let mEnd = moment(e, 'DD-MM-YYYY hh:mm');
 
-    if (this.selectCustomer !== '') {
-      this.city = this.selectCustomer.city;
+      let diff = mEnd.diff(mStart, 'minutes');
+      this.durDays = Math.floor(diff / 1440);
+      this.durHours = Math.floor((diff % 1440) / 60);
 
-      console.log(this.selectCustomer.city, 'Select');
-    }
+      let catering = {
+        breakfast: this.breakfast,
+        launch: this.launch,
+        dinner: this.dinner,
+      };
 
-    if (this.isValid) {
-      console.log(this.isValid);
-      /*this.myTravel = {
-        start: start.toISOString(),
-        end: end.toISOString(),
-        customer: this.selectCustomer,
-      };*/
+      this.rate = isNaN(Helpers.calcRate(diff, this.selectCustomer, catering))
+        ? 0
+        : Helpers.calcRate(diff, this.selectCustomer, catering);
     }
   }
 
