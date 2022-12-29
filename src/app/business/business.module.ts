@@ -7,6 +7,7 @@ import { MaterialModule } from '../shared/material/material.module';
 import { SidenavComponent } from '../sidenav/sidenav.component';
 import { ToolbarComponent } from '../toolbar/toolbar.component';
 import { BusinessAppComponent } from './business-app.component';
+import { CountryListComponent } from './country-list/country-list.component';
 import { CreateOrUpdateCountryComponent } from './create-or-update-country/create-or-update-country.component';
 import { CreateOrUpdateCustomerComponent } from './create-or-update-customer/create-or-update-customer.component';
 import { CreateOrUpdateTravelComponent } from './create-or-update-travel/create-or-update-travel.component';
@@ -29,8 +30,15 @@ const routes: Routes = [
       { path: 'updateTravel/:id', component: CreateOrUpdateTravelComponent },
       { path: 'user', component: UserComponent },
       { path: 'travel-list', component: TravelListComponent },
+      { path: 'country-list', component: CountryListComponent },
+      { path: 'customer-list', component: CustomerListComponent },
       { path: 'createCustomer', component: CreateOrUpdateCustomerComponent },
+      {
+        path: 'updateCustomer/:id',
+        component: CreateOrUpdateCustomerComponent,
+      },
       { path: 'createCountry', component: CreateOrUpdateCountryComponent },
+      { path: 'updateCountry/:id', component: CreateOrUpdateCountryComponent },
     ],
   },
 ];
@@ -50,6 +58,7 @@ const routes: Routes = [
     CreateOrUpdateCustomerComponent,
     CustomerListComponent,
     CreateOrUpdateCountryComponent,
+    CountryListComponent,
   ],
   imports: [
     CommonModule,

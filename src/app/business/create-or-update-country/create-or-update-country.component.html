@@ -1,1 +1,33 @@
-<p>create-or-update-country works!</p>
+<div class="container">
+  <form [formGroup]="myCountryForm" (ngSubmit)="submit($event)">
+    <div class="row">
+      <mat-form-field class="full-width">
+        <mat-label>Name</mat-label>
+        <input type="text" matInput formControlName="name" />
+      </mat-form-field>
+    </div>
+    <div class="row">
+      <mat-form-field class="full-width">
+        <mat-label>Tagespauschale</mat-label>
+        <input type="number" matInput formControlName="rate" />
+      </mat-form-field>
+    </div>
+    <div class="row">
+      <mat-form-field class="full-width">
+        <mat-label>Pauschale für An-und Abreise</mat-label>
+        <input type="number" matInput formControlName="halfRate" />
+      </mat-form-field>
+    </div>
+    <div class="row btn-submit">
+      <button
+        type="submit"
+        class="full-width"
+        mat-raised-button
+        color="primary"
+      >
+        <mat-icon>save</mat-icon>Speichern
+      </button>
+    </div>
+  </form>
+  <div>{{ myCountryForm.value | json }}</div>
+</div>

@@ -1,39 +1,26 @@
+import { Country } from 'src/app/models/country';
+
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 
-const customer = [
-  {
-    id: '4711',
-    city: 'Horgen',
-    name: 'Bank-now',
-    country: { name: 'Schweiz', rate: 64, halfRate: 32 },
-  },
-  {
-    id: '4712',
-    city: 'Linz',
-    name: 'Oberbank',
-    country: { name: 'Österreich', rate: 24, halfRate: 12 },
-  },
-  {
-    id: '4713',
-    city: 'Grünwald',
-    name: 'AIL',
-    country: { name: 'Deutschland', rate: 24, halfRate: 12 },
-  },
+const countries: Country[] = [
+  { id: '1', name: 'Schweiz', rate: 64, halfRate: 32 },
+  { id: '2', name: 'Österreich', rate: 24, halfRate: 12 },
+  { id: '3', name: 'Deutschland', rate: 24, halfRate: 12 },
 ];
 
 @Component({
-  selector: 'app-customer-list',
-  templateUrl: './customer-list.component.html',
-  styleUrls: ['./customer-list.component.scss'],
+  selector: 'app-country-list',
+  templateUrl: './country-list.component.html',
+  styleUrls: ['./country-list.component.scss'],
 })
-export class CustomerListComponent implements OnInit, AfterViewInit {
+export class CountryListComponent implements OnInit, AfterViewInit {
   filterValue = '';
-  displayedColumns: string[] = ['id', 'name', 'city', 'country', 'actions'];
-  dataSource = new MatTableDataSource(customer);
+  displayedColumns: string[] = ['id', 'name', 'rate', 'halfRate', 'actions'];
+  dataSource = new MatTableDataSource(countries);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -53,13 +40,13 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  updateCustomer(id: any) {
+  updateCountry(id: any) {
     if (id !== null) {
-      this.router.navigate(['/business/updateCustomer', id]);
+      this.router.navigate(['/business/updateCountry', id]);
     }
   }
 
-  deleteCustomer(rowId: number, id: string) {
+  deleteCountry(rowId: number, id: string) {
     console.log(rowId);
     console.log(id);
     this.dataSource.data.splice(rowId, 1);

@@ -24,7 +24,7 @@ export class SidenavComponent implements OnInit {
       action: 'newTravel',
       path: '/business/createTravel',
       display: 'Neue Reise',
-      icon: 'luggage',
+      icon: 'flight_takeoff',
     },
     {
       action: 'allTravels',
@@ -34,14 +34,14 @@ export class SidenavComponent implements OnInit {
     },
     {
       action: 'newCustomer',
-      path: '/business/createCustomer',
-      display: 'Neuer Kunde',
+      path: '/business/customer-list',
+      display: 'Kunden',
       icon: 'person_add',
     },
     {
       action: 'country',
-      path: '/business/createCountry',
-      display: 'Neues Land',
+      path: '/business/country-list',
+      display: 'Länder',
       icon: 'south_america',
     },
     {
