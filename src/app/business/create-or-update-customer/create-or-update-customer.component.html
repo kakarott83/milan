@@ -1,0 +1,39 @@
+<div class="container">
+  <form [formGroup]="myCustomerForm" (ngSubmit)="submit($event)">
+    <div class="row">
+      <mat-form-field class="full-width">
+        <mat-label>Name</mat-label>
+        <input type="text" matInput formControlName="name" />
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field class="full-width">
+        <mat-label>Stadt</mat-label>
+        <input type="text" matInput formControlName="city" />
+      </mat-form-field>
+    </div>
+
+    <div class="row">
+      <mat-form-field class="full-width">
+        <mat-label>Land</mat-label>
+        <mat-select formControlName="country">
+          <mat-option *ngFor="let country of countryList" [value]="country">
+            {{ country.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="row btn-submit">
+      <button
+        type="submit"
+        class="full-width"
+        mat-raised-button
+        color="primary"
+      >
+        <mat-icon>save</mat-icon>Speichern
+      </button>
+    </div>
+  </form>
+  <div>{{ myCustomerForm.value | json }}</div>
+</div>

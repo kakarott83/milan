@@ -34,9 +34,15 @@ export class SidenavComponent implements OnInit {
     },
     {
       action: 'newCustomer',
-      path: '',
+      path: '/business/createCustomer',
       display: 'Neuer Kunde',
       icon: 'person_add',
+    },
+    {
+      action: 'country',
+      path: '/business/createCountry',
+      display: 'Neues Land',
+      icon: 'south_america',
     },
     {
       action: 'user',

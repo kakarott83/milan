@@ -1,3 +1,5 @@
+import * as moment from 'moment';
+
 import { Catering } from '../../models/catering';
 import { Customer } from '../../models/customer';
 
@@ -45,12 +47,32 @@ export class Helpers {
       //Anzahl Tage
       if (durDays == 1) {
         return (
-          (customer.country?.rate as number) * durDays -
+          (customer.country?.rate as number) -
           (customer.country?.rate as number) * deduction
+        );
+      }
+
+      if (durDays > 1) {
+        return (
+          (customer.country?.rate as number) * durDays -
+          (customer.country?.rate as number) * deduction * durDays
         );
       }
     }
 
     return 0;
+  }
+
+  static dateTime(date: Date, time: string): Date {
+    let t = time.split(':');
+    date.setHours(Number(t[0]));
+    date.setMinutes(Number(t[1]));
+    return date;
+  }
+
+  static calcDiffinMinutes(start: Date, end: Date): number {
+    let mStart = moment(start, 'DD-MM-YYYY hh:mm');
+    let mEnd = moment(end, 'DD-MM-YYYY hh:mm');
+    return mEnd.diff(mStart, 'minutes');
   }
 }

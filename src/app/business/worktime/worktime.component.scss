@@ -50,3 +50,7 @@ span {
   justify-content: center;
   font-family: "Ubuntu", sans-serif;
 }
+
+::ng-deep.special-date {
+  background-color: lightblue !important;
+}

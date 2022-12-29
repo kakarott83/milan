@@ -3,6 +3,7 @@ import { map, Observable, startWith } from 'rxjs';
 import { Customer } from 'src/app/models/customer';
 import { Helpers } from 'src/app/shared/material/Helpers';
 
+import { isNgTemplate } from '@angular/compiler';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
@@ -64,6 +65,7 @@ export class CreateOrUpdateTravelComponent implements OnInit {
   durHours: any;
   rate = 0;
   spendValue = 0;
+  total = 0;
 
   constructor(
     private router: Router,
@@ -147,12 +149,25 @@ export class CreateOrUpdateTravelComponent implements OnInit {
     }
   }
 
-  submitTravel(event: any) {}
+  submitTravel(event: any) {
+    this.createMyTravel();
+    console.log(this.myTravel, 'MyTravel');
+  }
+
+  createMyTravel() {
+    this.myTravel = {
+      start: Helpers.dateTime(this.start as Date, this.startTime).toString(),
+      end: Helpers.dateTime(this.end as Date, this.endTime).toString(),
+      spend: this.mySpends,
+      customer: this.selectCustomer,
+      rate: this.rate,
+      spendValue: this.spendValue,
+      total: this.total,
+    };
+  }
 
   onChanges() {
     this.myTravelForm.valueChanges.subscribe((val) => {
-      console.log(val);
-      console.log(this.startTime, 'Changes');
       this.setValue();
     });
   }
@@ -165,8 +180,6 @@ export class CreateOrUpdateTravelComponent implements OnInit {
       text: [dates.text],
     });
   }
-
-  updateTime(event: any, type: string) {}
 
   displayFn(customer: Customer): string {
     return customer && customer.name ? customer.name : '';
@@ -181,35 +194,29 @@ export class CreateOrUpdateTravelComponent implements OnInit {
   }
 
   setValue() {
+    //Ort des Kunden setzen
     if (this.selectCustomer) {
       this.city = this.selectCity;
     }
 
-    /*ToDo Summieren*/
+    //Ausgaben summieren
     this.mySpends = this.spends.value;
     let v = 0;
-    this.mySpends.forEach((x) => (v += x.value !== undefined ? x.value : 0));
+    this.mySpends.forEach(
+      (x) => (v += x.value !== undefined ? Number(x.value) : 0)
+    );
     this.spendValue = v;
 
+    //Zeiten berechnen und Erstattung summieren
     if (
       this.start !== '' &&
       this.end !== '' &&
       this.startTime !== '' &&
       this.endTime !== ''
     ) {
-      let s = this.start as Date;
-      let e = this.end as Date;
-      let tStartSplit = this.startTime.split(':');
-      let tEndSplit = this.endTime.split(':');
-      s.setHours(Number(tStartSplit[0]), Number(tStartSplit[1]), 0);
-      e.setHours(Number(tEndSplit[0]), Number(tEndSplit[1]), 0);
-
-      let mStart = moment(s, 'DD-MM-YYYY hh:mm');
-      let mEnd = moment(e, 'DD-MM-YYYY hh:mm');
-
-      let diff = mEnd.diff(mStart, 'minutes');
-      this.durDays = Math.floor(diff / 1440);
-      this.durHours = Math.floor((diff % 1440) / 60);
+      let s = Helpers.dateTime(this.start as Date, this.startTime);
+      let e = Helpers.dateTime(this.end as Date, this.endTime);
+      let diff = Helpers.calcDiffinMinutes(s, e);
 
       let catering = {
         breakfast: this.breakfast,
@@ -220,13 +227,15 @@ export class CreateOrUpdateTravelComponent implements OnInit {
       this.rate = isNaN(Helpers.calcRate(diff, this.selectCustomer, catering))
         ? 0
         : Helpers.calcRate(diff, this.selectCustomer, catering);
+
+      this.total = this.rate + this.spendValue;
     }
   }
 
   openDialog(): void {
     const dialogRef = this.dialog.open(SpendsDialogComponent, {
       width: '600px',
-      height: '400px',
+      height: '600px',
     });
 
     dialogRef.afterClosed().subscribe((data) => {

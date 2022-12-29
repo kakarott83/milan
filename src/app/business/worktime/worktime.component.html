@@ -6,6 +6,7 @@
           <mat-calendar
             [(selected)]="selected"
             (dateChange)="addEvent($event)"
+            [dateClass]="dateClass()"
           ></mat-calendar>
         </mat-card>
       </div>
@@ -63,7 +64,11 @@
 
         <mat-form-field class="full-width">
           <mat-label>Kommentar</mat-label>
-          <textarea type="date" matInput formControlName="wtComment"></textarea>
+          <textarea
+            type="string"
+            matInput
+            formControlName="wtComment"
+          ></textarea>
         </mat-form-field>
 
         <div class="duration">

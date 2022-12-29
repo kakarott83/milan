@@ -2,7 +2,7 @@ import * as moment from 'moment';
 
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { MatCalendarCellCssClasses } from '@angular/material/datepicker';
 
 import { Worktime } from '../../models/worktime';
 
@@ -17,6 +17,17 @@ export class WorktimeComponent implements OnInit {
   dateDiff: any;
   wtDuration: any;
   myWorktime!: Worktime;
+  viewMonth: any;
+  date = new FormControl(moment());
+
+  //MockDates
+  datesToHighlight = [
+    '2022-11-22T18:30:00.000Z',
+    '2022-12-22T18:30:00.000Z',
+    '2022-12-24T18:30:00.000Z',
+    '2022-12-27T18:30:00.000Z',
+    '2022-12-29T18:30:00.000Z',
+  ];
 
   workTimeForm: FormGroup;
   constructor(private fb: FormBuilder) {
@@ -95,5 +106,20 @@ export class WorktimeComponent implements OnInit {
     console.log(this.selected);
     console.log(this.workTimeForm.value);
     console.log(event);
+  }
+
+  //Setzen der erfassten Tage
+  dateClass() {
+    return (date: Date): MatCalendarCellCssClasses => {
+      const highlightDate = this.datesToHighlight
+        .map((strDate) => new Date(strDate))
+        .some(
+          (d) =>
+            d.getDate() === date.getDate() &&
+            d.getMonth() === date.getMonth() &&
+            d.getFullYear() === date.getFullYear()
+        );
+      return highlightDate ? 'special-date' : '';
+    };
   }
 }

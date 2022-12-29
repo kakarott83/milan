@@ -15,7 +15,6 @@
                 [matDatepicker]="pickerDateStart"
                 formControlName="start"
               />
-              <mat-hint>MM/DD/YYYY</mat-hint>
               <mat-datepicker-toggle
                 matIconSuffix
                 [for]="pickerDateStart"
@@ -42,7 +41,6 @@
             <ngx-mat-timepicker
               color="primary"
               #pickerTimeStart
-              (closed)="updateTime($event, start)"
             ></ngx-mat-timepicker>
           </div>
         </div>
@@ -55,7 +53,6 @@
                 [matDatepicker]="pickerDateEnd"
                 formControlName="end"
               />
-              <mat-hint>MM/DD/YYYY</mat-hint>
               <mat-datepicker-toggle
                 matIconSuffix
                 [for]="pickerDateEnd"
@@ -82,7 +79,6 @@
             <ngx-mat-timepicker
               color="primary"
               #pickerTimeEnd
-              (closed)="updateTime($event, 'end')"
             ></ngx-mat-timepicker>
           </div>
         </div>
@@ -157,20 +153,19 @@
                       </mat-form-field>
                     </div-->
 
-                    <div class="col">
+                    <div class="col-2">
                       <mat-form-field class="full-width">
                         <mat-label>Typ</mat-label>
                         <input type="string" matInput formControlName="type" />
                       </mat-form-field>
                     </div>
-                    <div class="col">
+                    <div class="col-2">
                       <mat-form-field class="full-width">
                         <input
                           matInput
                           [matDatepicker]="spendDate"
                           formControlName="date"
                         />
-                        <mat-hint>MM/DD/YYYY</mat-hint>
                         <mat-datepicker-toggle
                           matIconSuffix
                           [for]="spendDate"
@@ -179,10 +174,17 @@
                       </mat-form-field>
                     </div>
 
-                    <div class="col">
+                    <div class="col-2">
                       <mat-form-field class="full-width">
                         <mat-label>Betrag</mat-label>
                         <input type="number" matInput formControlName="value" />
+                      </mat-form-field>
+                    </div>
+
+                    <div class="col-5">
+                      <mat-form-field class="full-width">
+                        <mat-label>Kommentar</mat-label>
+                        <input type="string" matInput formControlName="text" />
                       </mat-form-field>
                     </div>
 
@@ -246,7 +248,9 @@
                   <b>Gesamt</b>
                 </div></mat-grid-tile
               >
-              <mat-grid-tile><div class="list-value">400€</div></mat-grid-tile>
+              <mat-grid-tile
+                ><div class="list-value">{{ total }}</div></mat-grid-tile
+              >
             </mat-grid-list>
           </div>
         </mat-card-content>
@@ -254,4 +258,5 @@
     </div>
   </div>
   <div>Valid {{ myTravelForm.valid }}</div>
+  <div>TravelForm {{ myTravelForm.value | json }}</div>
 </div>

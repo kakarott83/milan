@@ -7,4 +7,7 @@ export interface Travel {
   end?: string;
   spend?: Spend[];
   customer?: Customer;
+  rate?: number;
+  spendValue?: number;
+  total?: number;
 }
