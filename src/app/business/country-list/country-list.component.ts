@@ -6,6 +6,8 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 
+import { DataServiceService } from '../../shared/service/data-service.service';
+
 const countries: Country[] = [
   { id: '1', name: 'Schweiz', rate: 64, halfRate: 32 },
   { id: '2', name: 'Österreich', rate: 24, halfRate: 12 },
@@ -20,14 +22,20 @@ const countries: Country[] = [
 export class CountryListComponent implements OnInit, AfterViewInit {
   filterValue = '';
   displayedColumns: string[] = ['id', 'name', 'rate', 'halfRate', 'actions'];
+  countryList: any;
   dataSource = new MatTableDataSource(countries);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private mockService: DataServiceService
+  ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.getCountries();
+  }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
@@ -38,6 +46,10 @@ export class CountryListComponent implements OnInit, AfterViewInit {
     if (filter !== null) {
       this.dataSource.filter = filter.trim().toLowerCase();
     }
+  }
+
+  createCountry() {
+    this.router.navigate(['business/createCountry']);
   }
 
   updateCountry(id: any) {

@@ -10,4 +10,5 @@ export interface Travel {
   rate?: number;
   spendValue?: number;
   total?: number;
+  userId?: string;
 }

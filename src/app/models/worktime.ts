@@ -5,4 +5,5 @@ export interface Worktime {
   duration: string;
   break: string;
   comment: string;
+  userId?: string;
 }

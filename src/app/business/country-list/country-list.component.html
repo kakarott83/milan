@@ -1,18 +1,26 @@
 <div class="mat-elevation-z8">
-  <mat-form-field>
-    <mat-label>Filter</mat-label>
-    <input
-      matInput
-      [(ngModel)]="filterValue"
-      (keyup)="applyFilter(filterValue)"
-      placeholder="Eingabe"
-      #input
-      autocomplete="off"
-    />
-    <button mat-icon-button matIconSuffix (click)="clearFilter($event)">
-      <mat-icon>backspace</mat-icon>
-    </button>
-  </mat-form-field>
+  <div class="header-container-table">
+    <mat-form-field>
+      <mat-label>Filter</mat-label>
+      <input
+        matInput
+        [(ngModel)]="filterValue"
+        (keyup)="applyFilter(filterValue)"
+        placeholder="Eingabe"
+        #input
+        autocomplete="off"
+      />
+      <button mat-icon-button matIconSuffix (click)="clearFilter($event)">
+        <mat-icon>backspace</mat-icon>
+      </button>
+    </mat-form-field>
+    <div class="header-button-table">
+      <button mat-raised-button (click)="createCountry()">
+        <mat-icon>add</mat-icon>
+        Neues Land
+      </button>
+    </div>
+  </div>
 
   <table mat-table [dataSource]="dataSource" matSort>
     <!--Position Column-->
@@ -67,7 +75,7 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let country; let i = index">
-        <div>
+        <div class="action-buttons">
           <button
             mat-icon-button
             (click)="updateCountry(country.id)"
@@ -90,7 +98,7 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
     <tr class="mat-row" *matNoDataRow>
-      <td class="mat-cell" colspan="4">
+      <td class="mat-cell">
         <div class="cell-data">
           No data matching the filter "{{ input.value }}"
         </div>

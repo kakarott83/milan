@@ -53,6 +53,10 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
     }
   }
 
+  createCustomer() {
+    this.router.navigate(['business/createCustomer']);
+  }
+
   updateCustomer(id: any) {
     if (id !== null) {
       this.router.navigate(['/business/updateCustomer', id]);

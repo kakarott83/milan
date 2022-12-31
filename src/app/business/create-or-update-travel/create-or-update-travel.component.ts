@@ -66,6 +66,7 @@ export class CreateOrUpdateTravelComponent implements OnInit {
   rate = 0;
   spendValue = 0;
   total = 0;
+  userId = '';
 
   constructor(
     private router: Router,
@@ -147,6 +148,7 @@ export class CreateOrUpdateTravelComponent implements OnInit {
     ) {
       console.log('Empty');
     }
+    this.createUser();
   }
 
   submitTravel(event: any) {
@@ -163,7 +165,14 @@ export class CreateOrUpdateTravelComponent implements OnInit {
       rate: this.rate,
       spendValue: this.spendValue,
       total: this.total,
+      userId: localStorage.getItem('userId')?.toString(),
     };
+  }
+
+  createUser() {
+    let r = (Math.random() + 1).toString(36).substring(7);
+    localStorage.setItem('userId', r);
+    this.userId = r;
   }
 
   onChanges() {
