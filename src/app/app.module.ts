@@ -1,4 +1,5 @@
-import { environment } from 'src/environment';
+import { ToastrModule } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
 
 import { NgModule } from '@angular/core';
 // Import Firebase modules + environment
@@ -42,6 +43,7 @@ const routes: Routes = [
     AngularFireStorageModule,
     AngularFireDatabaseModule,
     RouterModule.forRoot(routes),
+    ToastrModule.forRoot(),
   ],
 
   providers: [],

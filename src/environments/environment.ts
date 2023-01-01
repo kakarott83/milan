@@ -3,6 +3,8 @@ export const environment = {
   firebaseConfig: {
     apiKey: 'AIzaSyA6LWKkUzbhjA_nVW6STqY1q80G0x0kn2Q',
     authDomain: 'milan-adf44.firebaseapp.com',
+    databaseURL:
+      'https://milan-adf44-default-rtdb.europe-west1.firebasedatabase.app',
     projectId: 'milan-adf44',
     storageBucket: 'milan-adf44.appspot.com',
     messagingSenderId: '1034383853377',

@@ -75,4 +75,12 @@ export class Helpers {
     let mEnd = moment(end, 'DD-MM-YYYY hh:mm');
     return mEnd.diff(mStart, 'minutes');
   }
+
+  static convertMsToHM(milliseconds) {
+    let d = moment.duration(milliseconds, 'milliseconds');
+    let h = Math.floor(d.asHours());
+    let m = Math.floor(d.asMinutes()) - h * 60;
+
+    return h + ':' + m;
+  }
 }

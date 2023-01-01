@@ -1,91 +1,138 @@
 <div class="container">
-  <form [formGroup]="workTimeForm" (ngSubmit)="submit($event)">
-    <div class="row">
-      <div class="col mb-6">
-        <mat-card class="calendar">
-          <mat-calendar
-            [(selected)]="selected"
-            (dateChange)="addEvent($event)"
-            [dateClass]="dateClass()"
-          ></mat-calendar>
-        </mat-card>
-      </div>
-      <div class="col mb-6">
-        <div class="selected-Date">
-          {{ selected | date : "d MMMM yyyy" }}
+  <div class="row">
+    <div class="col-md-9">
+      <form [formGroup]="workTimeForm" (ngSubmit)="submit($event)">
+        <div class="row">
+          <div class="col mb-6">
+            <mat-card class="calendar">
+              <mat-calendar
+                [(selected)]="selected"
+                (dateChange)="addEvent($event)"
+                [dateClass]="dateClass()"
+                (selectedChange)="changeSelectedDate($event)"
+              ></mat-calendar>
+            </mat-card>
+          </div>
+          <div class="col mb-6">
+            <div class="selected-Date">
+              {{ selected | date : "d MMMM yyyy" }}
+            </div>
+
+            <mat-form-field class="full-width">
+              <mat-label>Beginn</mat-label>
+              <input
+                matInput
+                name="selected_time_B"
+                [format]="24"
+                formControlName="wtStart"
+                [ngxMatTimepicker]="pickerStart"
+                placeholder="Beginn"
+              />
+              <mat-icon matSuffix (click)="pickerStart.open()">
+                schedule
+              </mat-icon>
+            </mat-form-field>
+            <ngx-mat-timepicker
+              color="primary"
+              #pickerStart
+              (closed)="updateTime($event)"
+            ></ngx-mat-timepicker>
+
+            <mat-form-field class="full-width">
+              <mat-label>Ende</mat-label>
+              <input
+                matInput
+                name="selected_time_B"
+                [format]="24"
+                formControlName="wtEnd"
+                [ngxMatTimepicker]="pickerEnd"
+                placeholder="Ende"
+                readonly
+              />
+              <mat-icon matSuffix (click)="pickerEnd.open()">
+                schedule
+              </mat-icon>
+            </mat-form-field>
+            <ngx-mat-timepicker
+              color="primary"
+              #pickerEnd
+              (closed)="updateTime($event)"
+            ></ngx-mat-timepicker>
+
+            <mat-form-field class="full-width">
+              <mat-label>Pause</mat-label>
+              <input
+                matInput
+                type="time"
+                formControlName="wtBreak"
+                (change)="updateTime($event)"
+              />
+            </mat-form-field>
+
+            <mat-form-field class="full-width">
+              <mat-label>Kommentar</mat-label>
+              <textarea
+                type="string"
+                matInput
+                formControlName="wtComment"
+              ></textarea>
+            </mat-form-field>
+
+            <div class="duration">
+              Dauer: <span>{{ wtDuration }}</span> Stunden
+            </div>
+          </div>
         </div>
-
-        <mat-form-field class="full-width">
-          <mat-label>Beginn</mat-label>
-          <input
-            matInput
-            name="selected_time_B"
-            [format]="24"
-            formControlName="wtStart"
-            [ngxMatTimepicker]="pickerStart"
-            placeholder="Beginn"
-          />
-          <mat-icon matSuffix (click)="pickerStart.open()"> schedule </mat-icon>
-        </mat-form-field>
-        <ngx-mat-timepicker
-          color="primary"
-          #pickerStart
-          (closed)="updateTime($event)"
-        ></ngx-mat-timepicker>
-
-        <mat-form-field class="full-width">
-          <mat-label>Ende</mat-label>
-          <input
-            matInput
-            name="selected_time_B"
-            [format]="24"
-            formControlName="wtEnd"
-            [ngxMatTimepicker]="pickerEnd"
-            placeholder="Ende"
-            readonly
-          />
-          <mat-icon matSuffix (click)="pickerEnd.open()"> schedule </mat-icon>
-        </mat-form-field>
-        <ngx-mat-timepicker
-          color="primary"
-          #pickerEnd
-          (closed)="updateTime($event)"
-        ></ngx-mat-timepicker>
-
-        <mat-form-field class="full-width">
-          <mat-label>Pause</mat-label>
-          <input
-            matInput
-            type="time"
-            formControlName="wtBreak"
-            (change)="updateTime($event)"
-          />
-        </mat-form-field>
-
-        <mat-form-field class="full-width">
-          <mat-label>Kommentar</mat-label>
-          <textarea
-            type="string"
-            matInput
-            formControlName="wtComment"
-          ></textarea>
-        </mat-form-field>
-
-        <div class="duration">
-          Dauer: <span>{{ wtDuration }}</span> Stunden
+        <div class="row btn-submit">
+          <button
+            type="submit"
+            class="full-width"
+            mat-raised-button
+            color="primary"
+          >
+            <mat-icon>save</mat-icon>Speichern
+          </button>
         </div>
-      </div>
+      </form>
     </div>
-    <div class="row btn-submit">
-      <button
-        type="submit"
-        class="full-width"
-        mat-raised-button
-        color="primary"
-      >
-        <mat-icon>save</mat-icon>Speichern
-      </button>
+    <div class="col">
+      <mat-card>
+        <mat-card-header>
+          <div>
+            <h2>Information</h2>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="!loading; else loadWt">
+            <div class="card-info">
+              <div>{{ infoDate }}</div>
+              <mat-divider></mat-divider>
+              <mat-grid-list cols="2" rowHeight="3:1">
+                <mat-grid-tile>
+                  <div class="list-title">Arbeitszeit</div>
+                </mat-grid-tile>
+                <mat-grid-tile>
+                  <div class="list-value">{{ infoWt }}h</div></mat-grid-tile
+                >
+                <mat-grid-tile>
+                  <div class="list-title">Pause</div>
+                </mat-grid-tile>
+                <mat-grid-tile
+                  ><div class="list-value">{{ infoBreak }}h</div></mat-grid-tile
+                >
+              </mat-grid-list>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
-  </form>
+  </div>
   <div>{{ myWorktime | json }}</div>
+  <button mat-button (click)="getWorktime()">Fetch</button>
 </div>
+
+<ng-template #loadWt>
+  <div class="load-Data">
+    <mat-spinner diameter="25"></mat-spinner>
+  </div>
+</ng-template>

@@ -23,19 +23,30 @@ export class CountryListComponent implements OnInit, AfterViewInit {
   filterValue = '';
   displayedColumns: string[] = ['id', 'name', 'rate', 'halfRate', 'actions'];
   countryList: any;
-  dataSource = new MatTableDataSource(countries);
+  dataSource = new MatTableDataSource();
+  countries: Country[];
+  loading = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(
-    private router: Router,
-    private mockService: DataServiceService
-  ) {}
-
-  ngOnInit(): void {
-    this.getCountries();
+  constructor(private router: Router, public dataService: DataServiceService) {
+    let c = dataService.getCountryList();
+    this.loading = true;
+    c.snapshotChanges().subscribe((data) => {
+      this.countries = [];
+      data.forEach((item) => {
+        let x = item.payload.toJSON();
+        x['id'] = item.key;
+        this.countries.push(x as Country);
+      });
+      console.log(this.countries);
+      this.dataSource.data = this.countries;
+      this.loading = false;
+    });
   }
+
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
@@ -54,7 +65,7 @@ export class CountryListComponent implements OnInit, AfterViewInit {
 
   updateCountry(id: any) {
     if (id !== null) {
-      this.router.navigate(['/business/updateCountry', id]);
+      this.router.navigate(['business/updateCountry', id]);
     }
   }
 

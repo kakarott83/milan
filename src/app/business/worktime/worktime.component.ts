@@ -1,10 +1,15 @@
 import * as moment from 'moment';
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { MatCalendarCellCssClasses } from '@angular/material/datepicker';
+import {
+	MatCalendar,
+	MatCalendarCellCssClasses,
+} from '@angular/material/datepicker';
 
 import { Worktime } from '../../models/worktime';
+import { Helpers } from '../../shared/material/Helpers';
+import { DataServiceService } from '../../shared/service/data-service.service';
 
 @Component({
   selector: 'app-worktime',
@@ -14,32 +19,37 @@ import { Worktime } from '../../models/worktime';
 export class WorktimeComponent implements OnInit {
   selected: Date | null = new Date();
   selectedTime: any;
+  selectedWt: any;
   dateDiff: any;
   wtDuration: any;
   myWorktime!: Worktime;
   viewMonth: any;
   date = new FormControl(moment());
-
-  //MockDates
-  datesToHighlight = [
-    '2022-11-22T18:30:00.000Z',
-    '2022-12-22T18:30:00.000Z',
-    '2022-12-24T18:30:00.000Z',
-    '2022-12-27T18:30:00.000Z',
-    '2022-12-29T18:30:00.000Z',
-  ];
+  public loading = false;
+  userid = 'ea5eg'; // localStorage.getItem('userId');
+  datesToHighlight = [];
+  calcDates = [];
+  infoDate: any;
+  infoWt: any;
+  infoBreak: any;
 
   workTimeForm: FormGroup;
-  constructor(private fb: FormBuilder) {
-    this.workTimeForm = this.fb.group({
-      wtStart: new FormControl('08:00'),
-      wtEnd: new FormControl('17:00'),
-      wtBreak: new FormControl('01:00'),
-      wtComment: new FormControl(''),
-    });
+
+  @ViewChild(MatCalendar) calendar: MatCalendar<Date>;
+
+  constructor(
+    private fb: FormBuilder,
+    private dataService: DataServiceService
+  ) {
+    this.createWorkTimeForm();
+
+    //Dummy
+    localStorage.setItem('userId', 'ea5eg');
 
     this.updateTime();
     this.createWorktime();
+    this.getWorktime();
+    this.changeSelectedDate();
   }
 
   //Getter
@@ -65,6 +75,25 @@ export class WorktimeComponent implements OnInit {
 
   submit(event: Event) {
     this.createWorktime();
+    console.log(this.myWorktime);
+    this.dataService.createOrUpdateWorkTime(this.myWorktime);
+  }
+
+  createWorkTimeForm(myWorkTime?: Worktime) {
+    if (myWorkTime) {
+      this.workTimeForm = this.fb.group({
+        wtStart: new FormControl(myWorkTime.start),
+        wtEnd: new FormControl(myWorkTime.end),
+        wtBreak: new FormControl(myWorkTime.break),
+        wtComment: new FormControl(myWorkTime.comment),
+      });
+    } else
+      this.workTimeForm = this.fb.group({
+        wtStart: new FormControl('08:00'),
+        wtEnd: new FormControl('17:00'),
+        wtBreak: new FormControl('01:00'),
+        wtComment: new FormControl(''),
+      });
   }
 
   updateTime(event?: any) {
@@ -99,6 +128,8 @@ export class WorktimeComponent implements OnInit {
       break: this.wtBreak == null ? '' : this.wtBreak.toString(),
       duration: this.wtDuration == null ? '' : this.wtDuration.toString(),
       comment: this.wtComment == null ? '' : this.wtComment.toString(),
+      userId: localStorage.getItem('userId').toString(),
+      date: this.selected.toISOString(),
     };
   }
 
@@ -106,6 +137,69 @@ export class WorktimeComponent implements OnInit {
     console.log(this.selected);
     console.log(this.workTimeForm.value);
     console.log(event);
+  }
+
+  getWorktime() {
+    let t = this.dataService.getWorkTimeListByUser(this.userid);
+    this.loading = true;
+    t.snapshotChanges().subscribe((data) => {
+      this.datesToHighlight = [];
+      this.calcDates = [];
+      data.forEach((item) => {
+        let x = item.payload.toJSON() as Worktime;
+        x['id'] = item.key;
+        this.calcDates.push(x);
+        this.datesToHighlight.push(x.date);
+      });
+      this.calcWorktime(this.calcDates);
+      this.calendar.updateTodaysDate();
+      this.loading = false;
+    });
+  }
+
+  changeSelectedDate(event?: Event) {
+    this.infoDate = moment(this.selected).format('MMMM yyyy');
+    this.createWorkTimeForm();
+    this.calcWorktime(this.calcDates);
+    if (this.calcDates.length > 0) {
+      this.selectedWt = this.calcDates.find(
+        (item: Worktime) => item.date === this.selected.toISOString()
+      );
+      if (this.selectedWt !== undefined) {
+        this.dataService
+          .getWorkTimeById(this.selectedWt.id)
+          .snapshotChanges()
+          .subscribe((item) => {
+            let x = item.payload.toJSON();
+            x['id'] = item.key;
+            this.myWorktime = x as Worktime;
+            console.log(this.myWorktime, 'MyWorktime');
+            this.createWorkTimeForm(this.myWorktime);
+          });
+      }
+    }
+  }
+
+  calcWorktime(dates: Worktime[]) {
+    this.infoWt = null;
+
+    const filteredDates = dates.filter(
+      (x) =>
+        new Date(x.date).getMonth() === this.selected.getMonth() &&
+        new Date(x.date).getFullYear() === this.selected.getFullYear()
+    );
+
+    const wt = filteredDates.reduce(
+      (prev, curr) => moment.duration(curr.duration).add(prev),
+      moment.duration(0)
+    );
+    const breakTime = filteredDates.reduce(
+      (prev, curr) => moment.duration(curr.break).add(prev),
+      moment.duration(0)
+    );
+
+    this.infoWt = Helpers.convertMsToHM(wt.asMilliseconds());
+    this.infoBreak = Helpers.convertMsToHM(breakTime.asMilliseconds());
   }
 
   //Setzen der erfassten Tage

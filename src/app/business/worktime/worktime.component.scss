@@ -1,7 +1,10 @@
 input,
 button,
 mat-label,
+th,
+td,
 h2,
+div,
 span {
   font-family: "Ubuntu", sans-serif;
   font-weight: 700;
@@ -51,6 +54,30 @@ span {
   font-family: "Ubuntu", sans-serif;
 }
 
+::ng-deep .mat-mdc-card {
+  height: 100%;
+}
+
 ::ng-deep.special-date {
   background-color: lightblue !important;
+}
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.list-title {
+  width: 100%;
+}
+
+.list-value {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.load-Data {
+  display: flex;
+  justify-content: center;
 }

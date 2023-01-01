@@ -22,7 +22,12 @@
     </div>
   </div>
 
-  <table mat-table [dataSource]="dataSource" matSort>
+  <table
+    *ngIf="!loading; else loadData"
+    mat-table
+    [dataSource]="dataSource"
+    matSort
+  >
     <!--Position Column-->
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
@@ -99,9 +104,7 @@
 
     <tr class="mat-row" *matNoDataRow>
       <td class="mat-cell" colspan="4">
-        <div class="cell-data">
-          No data matching the filter "{{ input.value }}"
-        </div>
+        <div class="cell-data">keine Daten gefunden</div>
       </td>
     </tr>
   </table>
@@ -113,3 +116,9 @@
   >
   </mat-paginator>
 </div>
+
+<ng-template #loadData>
+  <div class="load-Data">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+</ng-template>

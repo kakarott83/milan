@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import { Country } from '../../models/country';
+import { DataServiceService } from '../../shared/service/data-service.service';
 
 @Component({
   selector: 'app-create-or-update-country',
@@ -13,7 +15,11 @@ export class CreateOrUpdateCountryComponent {
   myCountryForm: FormGroup;
   myCountryList: Country[] = [{}];
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    public dataService: DataServiceService,
+    private router: Router
+  ) {
     this.myCountryForm = fb.group({
       name: new FormControl(''),
       rate: new FormControl(''),
@@ -34,7 +40,8 @@ export class CreateOrUpdateCountryComponent {
 
   submit(e: Event) {
     this.createCountry();
-    console.log(this.myCountry);
+    this.dataService.addCountry(this.myCountry);
+    this.router.navigate(['business/country-list']);
   }
 
   createCountry() {
