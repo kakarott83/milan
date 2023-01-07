@@ -59,7 +59,7 @@
       </th>
       <td mat-cell *matCellDef="let country">
         <div class="cell-data">
-          {{ country.rate }}
+          {{ country.rate | currency : "EUR" }}
         </div>
       </td>
     </ng-container>
@@ -71,7 +71,7 @@
       </th>
       <td mat-cell *matCellDef="let country">
         <div class="cell-data">
-          {{ country.halfRate }}
+          {{ country.halfRate | currency : "EUR" }}
         </div>
       </td>
     </ng-container>

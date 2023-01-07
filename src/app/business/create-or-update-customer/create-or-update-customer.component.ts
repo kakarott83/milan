@@ -1,8 +1,8 @@
 import { Country } from 'src/app/models/country';
 
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Customer } from '../../models/customer';
 import { DataServiceService } from '../../shared/service/data-service.service';
@@ -18,37 +18,44 @@ const countryList = [
   templateUrl: './create-or-update-customer.component.html',
   styleUrls: ['./create-or-update-customer.component.scss'],
 })
-export class CreateOrUpdateCustomerComponent {
+export class CreateOrUpdateCustomerComponent implements OnInit, AfterViewInit {
   myCustomer: Customer = {};
   myCustomerForm: FormGroup;
   myCustomerList: Customer[] = [{}];
   countryList = countryList;
   countries: Country[];
   loading = false;
+  //selectCountry: any[];
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private dataService: DataServiceService
+    private dataService: DataServiceService,
+    private activeRoute: ActivatedRoute
   ) {
-    this.myCustomerForm = fb.group({
-      name: new FormControl(''),
-      city: new FormControl(''),
-      country: new FormControl(''),
-    });
-
-    let c = dataService.getCountryList();
-    this.loading = true;
-    c.snapshotChanges().subscribe((data) => {
-      this.countries = [];
-      data.forEach((item) => {
-        let x = item.payload.toJSON();
-        this.countries.push(x as Country);
-      });
-      console.log(this.countries);
-      this.loading = false;
-    });
+    this.getCountryList();
   }
+
+  ngOnInit(): void {
+    this.createCustomerForm();
+    const id = this.activeRoute.snapshot.paramMap.get('id');
+    if (id !== null) {
+      this.dataService
+        .getCustomerById(id)
+        .snapshotChanges()
+        .subscribe((data) => {
+          this.myCustomer = data.payload.toJSON();
+          this.myCustomerForm.patchValue({
+            name: this.myCustomer.name,
+            city: this.myCustomer.city,
+          });
+          const toSelectCountry = this.myCustomer.country;
+          this.myCustomerForm.get('country').setValue(toSelectCountry);
+        });
+    }
+  }
+
+  ngAfterViewInit(): void {}
 
   get name() {
     return this.myCustomerForm.get('name')?.value;
@@ -69,11 +76,38 @@ export class CreateOrUpdateCustomerComponent {
     this.router.navigate(['business/customer-list']);
   }
 
+  createCustomerForm() {
+    this.myCustomerForm = this.fb.group({
+      name: [this.myCustomer.name],
+      city: [this.myCustomer.city],
+      country: [''],
+    });
+  }
+
   createCustomer() {
     this.myCustomer = {
       name: this.name,
       city: this.city,
       country: this.selectedCountry,
     };
+  }
+
+  getCountryList() {
+    let c = this.dataService.getCountryList();
+    this.loading = true;
+    c.snapshotChanges().subscribe((data) => {
+      this.countries = [];
+      data.forEach((item) => {
+        let x = item.payload.toJSON();
+        this.countries.push(x as Country);
+      });
+      this.loading = false;
+    });
+  }
+
+  isSameCountry(country1: Country, country2: Country): boolean {
+    // vergleicht die Länderliste
+    // console.log(country1.name + ' ' + country2.name, 'Comp');
+    return !!country1 && country1.name === country2.name;
   }
 }

@@ -1,8 +1,9 @@
+import { Catering } from './catering';
 import { Customer } from './customer';
 import { Spend } from './spend';
 
 export interface Travel {
-  id?: number;
+  id?: string;
   start?: string;
   end?: string;
   spend?: Spend[];
@@ -11,4 +12,9 @@ export interface Travel {
   spendValue?: number;
   total?: number;
   userId?: string;
+  catering?: Catering;
+  breakfast?: boolean;
+  launch?: boolean;
+  dinner?: boolean;
+  reason?: string;
 }

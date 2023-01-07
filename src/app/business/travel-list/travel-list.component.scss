@@ -1,0 +1,22 @@
+input,
+button,
+mat-label,
+mat-cell,
+h2,
+span {
+  font-family: "Ubuntu", sans-serif;
+  font-weight: 700;
+}
+
+.mat-mdc-form-field {
+  font-size: 14px;
+}
+
+.cell-data {
+  font-family: "Ubuntu", sans-serif;
+}
+
+.load-Data {
+  display: flex;
+  justify-content: center;
+}

@@ -8,11 +8,11 @@ import { Router } from '@angular/router';
 
 import { DataServiceService } from '../../shared/service/data-service.service';
 
-const countries: Country[] = [
-  { id: '1', name: 'Schweiz', rate: 64, halfRate: 32 },
-  { id: '2', name: 'Österreich', rate: 24, halfRate: 12 },
-  { id: '3', name: 'Deutschland', rate: 24, halfRate: 12 },
-];
+// const countries: Country[] = [
+//   { id: '1', name: 'Schweiz', rate: 64, halfRate: 32 },
+//   { id: '2', name: 'Österreich', rate: 24, halfRate: 12 },
+//   { id: '3', name: 'Deutschland', rate: 24, halfRate: 12 },
+// ];
 
 @Component({
   selector: 'app-country-list',

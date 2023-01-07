@@ -1,1 +1,132 @@
-<p>travel-list works!</p>
+<div class="mat-elevation-z8">
+  <div class="header-container-table">
+    <mat-form-field>
+      <mat-label>Filter</mat-label>
+      <input
+        matInput
+        [(ngModel)]="filterValue"
+        (keyup)="applyFilter(filterValue)"
+        placeholder="Eingabe"
+        #input
+        autocomplete="off"
+      />
+      <button mat-icon-button matIconSuffix (click)="clearFilter($event)">
+        <mat-icon>backspace</mat-icon>
+      </button>
+    </mat-form-field>
+    <div class="header-button-table">
+      <button mat-raised-button (click)="createTravel()">
+        <mat-icon>add</mat-icon>
+        Neue Reise
+      </button>
+    </div>
+  </div>
+  <div *ngIf="!loading; else loadData">
+    <table mat-table [dataSource]="dataSource" matSort>
+      <!--Position Column-->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <div class="cell-data">Id</div>
+        </th>
+        <td mat-cell *matCellDef="let travel">
+          <div class="cell-data">
+            {{ travel.id }}
+          </div>
+        </td>
+      </ng-container>
+
+      <!--Name Column-->
+      <ng-container matColumnDef="start">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <div class="cell-data">Beginn</div>
+        </th>
+        <td mat-cell *matCellDef="let travel">
+          <div class="cell-data">
+            {{ travel.start | date : "dd.MM.yyyy" }}
+          </div>
+        </td>
+      </ng-container>
+
+      <!--Tagespauschale Column-->
+      <ng-container matColumnDef="end">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <div class="cell-data">Ende</div>
+        </th>
+        <td mat-cell *matCellDef="let travel">
+          <div class="cell-data">
+            {{ travel.end | date : "dd.MM.yyyy" }}
+          </div>
+        </td>
+      </ng-container>
+
+      <!--An-und Abreise Column-->
+      <ng-container matColumnDef="customer">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <div class="cell-data">Kunde</div>
+        </th>
+        <td mat-cell *matCellDef="let travel">
+          <div class="cell-data">
+            {{ travel.customer.name }}
+          </div>
+        </td>
+      </ng-container>
+
+      <!--An-und Abreise Column-->
+      <ng-container matColumnDef="total">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <div class="cell-data">Rückerstattung</div>
+        </th>
+        <td mat-cell *matCellDef="let travel">
+          <div class="cell-data">
+            {{ travel.total | currency : "EUR" : "symbol" }}
+          </div>
+        </td>
+      </ng-container>
+
+      <!--Edit Button Column-->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let travel; let i = index">
+          <div class="action-buttons">
+            <button
+              mat-icon-button
+              (click)="updateTravel(travel.id)"
+              color="primary"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="deleteTravel(i, travel.id)"
+              color="warn"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell">
+          <div class="cell-data">keine Daten gefunden</div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <mat-paginator
+    [pageSize]="5"
+    [pageSizeOptions]="[5, 10, 20]"
+    showFirstLastButtons
+  >
+  </mat-paginator>
+</div>
+
+<ng-template #loadData>
+  <div class="load-Data">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+</ng-template>

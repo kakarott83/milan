@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Country } from '../../models/country';
 import { DataServiceService } from '../../shared/service/data-service.service';
@@ -18,8 +18,21 @@ export class CreateOrUpdateCountryComponent {
   constructor(
     private fb: FormBuilder,
     public dataService: DataServiceService,
-    private router: Router
+    private router: Router,
+    private activeRoute: ActivatedRoute
   ) {
+    const id = activeRoute.snapshot.paramMap.get('id');
+    console.log(id, 'Id');
+    if (id !== '') {
+      let c = dataService.getCountryById(id);
+      c.snapshotChanges().subscribe((country) => {
+        this.myCountry = country.payload.toJSON();
+        this.createCountryForm(this.myCountry);
+      });
+    } else {
+      this.createCountryForm();
+    }
+
     this.myCountryForm = fb.group({
       name: new FormControl(''),
       rate: new FormControl(''),
@@ -42,6 +55,22 @@ export class CreateOrUpdateCountryComponent {
     this.createCountry();
     this.dataService.addCountry(this.myCountry);
     this.router.navigate(['business/country-list']);
+  }
+
+  createCountryForm(country?: Country) {
+    if (country) {
+      this.myCountryForm = this.fb.group({
+        name: new FormControl(country.name),
+        rate: new FormControl(country.rate),
+        halfRate: new FormControl(country.halfRate),
+      });
+    } else {
+      this.myCountryForm = this.fb.group({
+        name: new FormControl(''),
+        rate: new FormControl(''),
+        halfRate: new FormControl(''),
+      });
+    }
   }
 
   createCountry() {

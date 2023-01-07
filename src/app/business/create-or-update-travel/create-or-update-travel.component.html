@@ -13,6 +13,7 @@
               <input
                 matInput
                 [matDatepicker]="pickerDateStart"
+                [value]="startDate"
                 formControlName="start"
               />
               <mat-datepicker-toggle
@@ -51,6 +52,7 @@
               <input
                 matInput
                 [matDatepicker]="pickerDateEnd"
+                [value]="endDate"
                 formControlName="end"
               />
               <mat-datepicker-toggle
@@ -86,18 +88,9 @@
           <div class="col">
             <mat-form-field class="full-width">
               <mat-label>Kunde</mat-label>
-              <input
-                type="text"
-                placeholder="Pick one"
-                aria-label="Number"
-                matInput
+              <mat-select
                 formControlName="selectCustomer"
-                [matAutocomplete]="auto"
-              />
-              <mat-autocomplete
-                autoActiveFirstOption
-                #auto="matAutocomplete"
-                [displayWith]="displayFn"
+                [compareWith]="isSameCustomer"
               >
                 <mat-option
                   *ngFor="let customer of customerList"
@@ -105,7 +98,7 @@
                 >
                   {{ customer.name }}
                 </mat-option>
-              </mat-autocomplete>
+              </mat-select>
             </mat-form-field>
           </div>
           <div class="col">
@@ -118,8 +111,8 @@
             <mat-form-field class="full-width">
               <mat-label>Grund</mat-label>
               <mat-select formControlName="reason">
-                <mat-option *ngFor="let reason of reasons" [value]="reason">
-                  {{ reason }}
+                <mat-option *ngFor="let r of reasons" [value]="r">
+                  {{ r }}
                 </mat-option>
               </mat-select>
             </mat-form-field>
@@ -146,20 +139,13 @@
               <div *ngFor="let spend of spends.controls; let i = index">
                 <div [formGroupName]="i">
                   <div class="row">
-                    <!--div class="col">
-                      <mat-form-field class="full-width">
-                        <mat-label>Id</mat-label>
-                        <input type="number" matInput [value]="i" />
-                      </mat-form-field>
-                    </div-->
-
                     <div class="col-2">
                       <mat-form-field class="full-width">
                         <mat-label>Typ</mat-label>
                         <input type="string" matInput formControlName="type" />
                       </mat-form-field>
                     </div>
-                    <div class="col-2">
+                    <div class="col-3">
                       <mat-form-field class="full-width">
                         <input
                           matInput
@@ -181,7 +167,7 @@
                       </mat-form-field>
                     </div>
 
-                    <div class="col-5">
+                    <div class="col-4">
                       <mat-form-field class="full-width">
                         <mat-label>Kommentar</mat-label>
                         <input type="string" matInput formControlName="text" />
@@ -201,7 +187,7 @@
                 </div>
               </div>
             </div>
-            <button mat-raised-button (click)="openDialog()">
+            <button type="button" mat-raised-button (click)="openDialog()">
               <mat-icon>add</mat-icon>Neue Ausgaben
             </button>
           </div>
@@ -237,13 +223,17 @@
                 <div class="list-title">Pauschale</div>
               </mat-grid-tile>
               <mat-grid-tile>
-                <div class="list-value">{{ rate }}</div>
+                <div class="list-value">
+                  {{ rate | currency : "EUR" : "code" }}
+                </div>
               </mat-grid-tile>
               <mat-grid-tile
                 ><div class="list-title">Ausgaben</div></mat-grid-tile
               >
               <mat-grid-tile>
-                <div class="list-value">{{ spendValue }}</div>
+                <div class="list-value">
+                  {{ spendValue | currency : "EUR" : "code" }}
+                </div>
               </mat-grid-tile>
               <mat-grid-tile
                 ><div class="list-title">
@@ -251,7 +241,9 @@
                 </div></mat-grid-tile
               >
               <mat-grid-tile
-                ><div class="list-value">{{ total }}</div></mat-grid-tile
+                ><div class="list-value">
+                  {{ total | currency : "EUR" : "code" }}
+                </div></mat-grid-tile
               >
             </mat-grid-list>
           </div>
@@ -272,7 +264,4 @@
   </div>
   <div>Valid {{ myTravelForm.valid }}</div>
   <div>TravelForm {{ myTravelForm.value | json }}</div>
-  <div>
-    <button mat-button (click)="createUser()">CreateUser</button>
-  </div>
 </div>

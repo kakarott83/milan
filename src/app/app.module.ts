@@ -1,7 +1,11 @@
 import { ToastrModule } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 
-import { NgModule } from '@angular/core';
+/*Ländereinstellungen*/
+import { CurrencyPipe, DatePipe, registerLocaleData } from '@angular/common';
+import localeDe from '@angular/common/locales/de';
+import localeDeExtra from '@angular/common/locales/extra/de';
+import { LOCALE_ID, NgModule } from '@angular/core';
 // Import Firebase modules + environment
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
@@ -14,6 +18,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
+
+registerLocaleData(localeDe, 'de-DE', localeDeExtra);
 
 const routes: Routes = [
   {
@@ -46,7 +52,14 @@ const routes: Routes = [
     ToastrModule.forRoot(),
   ],
 
-  providers: [],
+  providers: [
+    {
+      provide: LOCALE_ID,
+      useValue: 'de-DE',
+    },
+    CurrencyPipe,
+    DatePipe,
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
