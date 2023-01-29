@@ -53,6 +53,8 @@ export class CreateOrUpdateTravelComponent implements OnInit {
   myDatePipe!: any;
   startDate;
   endDate;
+  sDate;
+  travelId;
 
   constructor(
     private router: Router,
@@ -67,7 +69,8 @@ export class CreateOrUpdateTravelComponent implements OnInit {
     this.createTravelForm();
     const id = this.activeRoute.snapshot.paramMap.get('id');
     if (id != null) {
-      console.log(id);
+      //console.log(id);
+      this.travelId = id;
       this.dataService
         .getTravelById(id)
         .snapshotChanges()
@@ -77,7 +80,6 @@ export class CreateOrUpdateTravelComponent implements OnInit {
           this.endDate = new Date(this.myTravel.end);
           this.city = this.myTravel.customer.city;
           this.reasonValue = this.myTravel.reason;
-          console.log(typeof this.myTravel.spend);
 
           //Array befüllen
           if (this.myTravel.spend !== undefined) {
@@ -100,10 +102,11 @@ export class CreateOrUpdateTravelComponent implements OnInit {
             breakfast: this.myTravel.catering.breakfast,
             launch: this.myTravel.catering.launch,
             dinner: this.myTravel.catering.dinner,
-            total: this.myTravel.total,
             spendValue: this.myTravel.spendValue,
-            rate: this.myTravel.rate,
           });
+
+          this.rate = this.myTravel.rate;
+          this.total = this.myTravel.total;
 
           const toSelectCustomer = this.myTravel.customer;
           this.myTravelForm.get('selectCustomer').setValue(toSelectCustomer);
@@ -215,6 +218,8 @@ export class CreateOrUpdateTravelComponent implements OnInit {
   }
 
   createMyTravel() {
+    console.log(this.mySpends);
+    this.mySpends.map((x) => (x.date = x.date.toString()));
     this.myTravel = {
       start: Helpers.dateTime(this.start as Date, this.startTime).toString(),
       end: Helpers.dateTime(this.end as Date, this.endTime).toString(),
@@ -266,9 +271,10 @@ export class CreateOrUpdateTravelComponent implements OnInit {
   }
 
   newSpend(dates: any): FormGroup {
-    console.log(dates.value, 'New');
+    console.log(dates.date, 'New');
+    //this.sDate = new Date(dates.date);
     return this.fb.group({
-      date: [dates.date],
+      date: [new Date(dates.date)],
       value: [dates.value],
       type: [dates.type],
       text: [dates.text],
@@ -280,7 +286,7 @@ export class CreateOrUpdateTravelComponent implements OnInit {
   }
 
   addSpend(dates: any) {
-    console.log(dates.value, 'Dates');
+    console.log(dates.date, 'Dates');
     this.spends.push(this.newSpend(dates));
   }
 
@@ -302,6 +308,8 @@ export class CreateOrUpdateTravelComponent implements OnInit {
     );
     this.spendValue = v;
 
+    //Spends setzen
+
     //Zeiten berechnen und Erstattung summieren
     if (
       this.start !== '' &&
@@ -313,24 +321,20 @@ export class CreateOrUpdateTravelComponent implements OnInit {
       let e = Helpers.dateTime(this.end as Date, this.endTime);
       let diff = Helpers.calcDiffinMinutes(s, e);
 
-      let catering = {
-        breakfast: this.breakfast,
-        launch: this.launch,
-        dinner: this.dinner,
-      };
-
-      this.rate = isNaN(Helpers.calcRate(diff, this.selectCustomer, catering))
-        ? 0
-        : Helpers.calcRate(diff, this.selectCustomer, catering);
-
-      this.total = this.rate + this.spendValue;
-
       //Set Catering
       this.myCatering = {
         breakfast: this.breakfast,
         launch: this.launch,
         dinner: this.dinner,
       };
+
+      this.rate = isNaN(
+        Helpers.calcRate(diff, this.selectCustomer, this.myCatering)
+      )
+        ? 0
+        : Helpers.calcRate(diff, this.selectCustomer, this.myCatering);
+
+      this.total = this.rate + this.spendValue;
     }
   }
 
@@ -338,6 +342,7 @@ export class CreateOrUpdateTravelComponent implements OnInit {
     const dialogRef = this.dialog.open(SpendsDialogComponent, {
       width: '600px',
       height: '600px',
+      data: { start: this.start, end: this.end },
     });
 
     dialogRef.afterClosed().subscribe((data) => {

@@ -16,9 +16,10 @@ export class SpendsDialogComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private currencyPipe: CurrencyPipe,
-    @Inject(MAT_DIALOG_DATA) data: { message: string },
+    @Inject(MAT_DIALOG_DATA) public data: any,
     public dialogRef: MatDialogRef<SpendsDialogComponent>
   ) {
+    console.log(data.start, 'DialogStart');
     this.form = this.fb.group({
       type: [''],
       date: [''],
@@ -27,23 +28,7 @@ export class SpendsDialogComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    // this.form.valueChanges.subscribe((f) => {
-    //   if (f.value) {
-    //     this.form.patchValue(
-    //       {
-    //         value: this.currencyPipe.transform(
-    //           f.value, //.replace(/\D/g, '').replace(/^0+/, ''),
-    //           'EUR',
-    //           'symbol',
-    //           '1.0-0'
-    //         ),
-    //       },
-    //       { emitEvent: false }
-    //     );
-    //   }
-    // });
-  }
+  ngOnInit(): void {}
 
   submit(form: NgForm) {
     console.log(form, 'Form');

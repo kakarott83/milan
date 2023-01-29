@@ -20,3 +20,11 @@ span {
   display: flex;
   justify-content: center;
 }
+
+tr.mat-row:hover {
+  background: whitesmoke;
+}
+
+button {
+  margin-right: 5px;
+}

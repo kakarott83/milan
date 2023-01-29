@@ -1,6 +1,10 @@
+import { from, merge, Observable, of as observableOf } from 'rxjs';
+import { catchError, map, startWith, switchMap } from 'rxjs/operators';
+
+import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, SortDirection } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 
@@ -13,8 +17,10 @@ import { DataServiceService } from '../../shared/service/data-service.service';
   styleUrls: ['./travel-list.component.scss'],
 })
 export class TravelListComponent implements OnInit, AfterViewInit {
+  selection = new SelectionModel<Travel>(true, []);
   filterValue = '';
   displayedColumns: string[] = [
+    'select',
     'id',
     'start',
     'end',
@@ -23,24 +29,22 @@ export class TravelListComponent implements OnInit, AfterViewInit {
     'actions',
   ];
   customerList: any;
-  dataSource = new MatTableDataSource();
+  dataSource = new MatTableDataSource<Travel>();
   travels: Travel[];
   userId = 'ea5eg'; // localStorage.getItem('userId');
-  loading = false;
+  loading = true;
+  dataObservable: any;
+  resultsLength = 0;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(private router: Router, public dataService: DataServiceService) {}
 
-  ngOnInit(): void {
-    this.getData();
-  }
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
-    console.log(this.dataSource.data, 'After');
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    this.getData();
   }
 
   applyFilter(filter: string) {
@@ -50,7 +54,7 @@ export class TravelListComponent implements OnInit, AfterViewInit {
   }
 
   async getData() {
-    this.loading = true;
+    //this.loading = true;
     let t = await this.dataService.getTravelListByUser(this.userId);
 
     t.snapshotChanges().subscribe((data) => {
@@ -59,12 +63,13 @@ export class TravelListComponent implements OnInit, AfterViewInit {
         let x = item.payload.toJSON();
         x['id'] = item.key;
         this.travels.push(x as Travel);
-        console.log(this.travels, 'WithUserId');
       });
       this.dataSource.data = this.travels;
-      console.log(this.dataSource.data, 'DataSource');
-      this.loading = false;
+      this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
     });
+
+    this.loading = false;
   }
 
   createTravel() {
@@ -83,5 +88,35 @@ export class TravelListComponent implements OnInit, AfterViewInit {
   clearFilter(event: Event) {
     this.filterValue = '';
     this.dataSource.filter = '';
+  }
+
+  submitTravel() {
+    console.log(this.selection.selected, 'Selection');
+  }
+
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.length;
+    return numSelected === numRows;
+  }
+
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  toggleAllRows() {
+    if (this.isAllSelected()) {
+      this.selection.clear();
+      return;
+    }
+
+    this.selection.select(...this.dataSource.data);
+  }
+
+  /** The label for the checkbox on the passed row */
+  checkboxLabel(row?: Travel): string {
+    if (!row) {
+      return `${this.isAllSelected() ? 'deselect' : 'select'} all`;
+    }
+    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${
+      row.id
+    }`;
   }
 }

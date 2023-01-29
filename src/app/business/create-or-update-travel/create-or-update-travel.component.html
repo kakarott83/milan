@@ -11,6 +11,7 @@
             <mat-form-field class="full-width">
               <mat-label>Beginn der Reise</mat-label>
               <input
+                #start
                 matInput
                 [matDatepicker]="pickerDateStart"
                 [value]="startDate"
@@ -50,6 +51,7 @@
             <mat-form-field class="full-width">
               <mat-label>Ende der Reise</mat-label>
               <input
+                #end
                 matInput
                 [matDatepicker]="pickerDateEnd"
                 [value]="endDate"
@@ -150,6 +152,7 @@
                         <input
                           matInput
                           [matDatepicker]="spendDate"
+                          [value]="sDate"
                           formControlName="date"
                         />
                         <mat-datepicker-toggle
@@ -187,7 +190,12 @@
                 </div>
               </div>
             </div>
-            <button type="button" mat-raised-button (click)="openDialog()">
+            <button
+              type="button"
+              mat-raised-button
+              [disabled]="!(start.value !== '' && end.value !== '')"
+              (click)="openDialog()"
+            >
               <mat-icon>add</mat-icon>Neue Ausgaben
             </button>
           </div>
@@ -257,11 +265,21 @@
             <mat-grid-tile
               ><div class="list-value">{{ userId }}</div></mat-grid-tile
             >
+            <mat-grid-tile
+              ><div class="list-title">
+                <b>TravelId</b>
+              </div></mat-grid-tile
+            >
+            <mat-grid-tile
+              ><div class="list-value">{{ travelId }}</div></mat-grid-tile
+            >
           </mat-grid-list>
         </mat-card-content>
       </mat-card>
     </div>
   </div>
-  <div>Valid {{ myTravelForm.valid }}</div>
+  <!--div>Valid {{ myTravelForm.valid }}</div>
   <div>TravelForm {{ myTravelForm.value | json }}</div>
+  <div>MySpend {{ mySpends }}</div>
+  <div *ngIf="start.value !== ''">Start{{ start.value }}</div-->
 </div>

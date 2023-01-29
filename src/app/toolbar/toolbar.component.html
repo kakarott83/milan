@@ -12,7 +12,7 @@
         <button mat-button [routerLink]="['/business/user']">
           <mat-icon>account_circle</mat-icon>
         </button>
-        <button mat-button>
+        <button (click)="logout()" mat-button>
           <mat-icon>logout</mat-icon>
         </button>
       </div>

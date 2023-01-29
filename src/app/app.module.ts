@@ -18,6 +18,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
+import { AuthService } from './shared/service/auth.service';
 
 registerLocaleData(localeDe, 'de-DE', localeDeExtra);
 
@@ -57,6 +58,7 @@ const routes: Routes = [
       provide: LOCALE_ID,
       useValue: 'de-DE',
     },
+    AuthService,
     CurrencyPipe,
     DatePipe,
   ],

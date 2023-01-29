@@ -15,6 +15,10 @@
       </button>
     </mat-form-field>
     <div class="header-button-table">
+      <button mat-raised-button (click)="submitTravel()">
+        <mat-icon>launch</mat-icon>
+        Einreichen
+      </button>
       <button mat-raised-button (click)="createTravel()">
         <mat-icon>add</mat-icon>
         Neue Reise
@@ -23,6 +27,28 @@
   </div>
   <div *ngIf="!loading; else loadData">
     <table mat-table [dataSource]="dataSource" matSort>
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox
+            color="primary"
+            (change)="$event ? toggleAllRows() : null"
+            [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()"
+            [aria-label]="checkboxLabel()"
+          >
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox
+            color="primary"
+            (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(row) : null"
+            [checked]="selection.isSelected(row)"
+            [aria-label]="checkboxLabel(row)"
+          >
+          </mat-checkbox>
+        </td>
+      </ng-container>
       <!--Position Column-->
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
@@ -107,7 +133,11 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        class="mat-row"
+      ></tr>
 
       <tr class="mat-row" *matNoDataRow>
         <td class="mat-cell">

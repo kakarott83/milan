@@ -25,6 +25,8 @@
           [matDatepicker]="spendDate"
           formControlName="date"
           placeholder="dd.MM.yyyy"
+          [min]="data.start"
+          [max]="data.end"
         />
         <mat-datepicker-toggle
           matIconSuffix
@@ -46,6 +48,7 @@
         <mat-label>Kommentar</mat-label>
         <textarea type="string" matInput formControlName="text"></textarea>
       </mat-form-field>
+      {{ data.start }}
     </form>
   </mat-dialog-content>
   <mat-dialog-actions>

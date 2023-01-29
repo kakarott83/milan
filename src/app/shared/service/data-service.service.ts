@@ -10,6 +10,7 @@ import {
 	AngularFireObject,
 } from '@angular/fire/compat/database';
 
+import { AppUser } from '../../models/appUser';
 import { Travel } from '../../models/travel';
 import { Worktime } from '../../models/worktime';
 
@@ -25,12 +26,15 @@ export class DataServiceService {
   workTimeRef: AngularFireObject<any>;
   travelListRef: AngularFireList<any>;
   travelRef: AngularFireObject<any>;
+  userListRef: AngularFireList<any>;
+  userRef: AngularFireObject<any>;
 
   constructor(private db: AngularFireDatabase) {
     this.countryListRef = db.list('/countries');
     this.customerListRef = db.list('/customers');
     this.workTimeListRef = db.list('/worktimes');
     this.travelListRef = db.list('/travels');
+    this.userListRef = db.list('/users');
   }
 
   //Hinzufügen
@@ -40,6 +44,27 @@ export class DataServiceService {
       rate: country.rate,
       halfRate: country.halfRate,
     });
+  }
+
+  addAppUser(appUser: AppUser) {
+    this.userListRef.push({
+      name: appUser.name,
+      uid: appUser.uid,
+    });
+  }
+
+  createOrUpdateAppUser(appUser: AppUser) {
+    if (appUser.id !== '') {
+      this.userRef.update({
+        name: appUser.name,
+        uid: appUser.uid,
+      });
+    } else {
+      this.userListRef.push({
+        name: appUser.name,
+        uid: appUser.uid,
+      });
+    }
   }
 
   createOrUpdateCountry(country: Country) {
@@ -158,6 +183,11 @@ export class DataServiceService {
   getCustomerList() {
     this.customerListRef = this.db.list('/customers');
     return this.customerListRef;
+  }
+
+  getAppUserByUid(uid: string) {
+    this.userRef = this.db.object('/users/' + uid);
+    return this.userRef;
   }
 
   getWorkTimeList() {
