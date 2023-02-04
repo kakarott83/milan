@@ -1,5 +1,5 @@
 import * as auth from 'firebase/auth';
-import { map } from 'rxjs';
+import { BehaviorSubject, map } from 'rxjs';
 import { User } from 'src/app/models/user';
 
 import { Injectable, NgZone } from '@angular/core';
@@ -18,6 +18,9 @@ import { DataServiceService } from './data-service.service';
 })
 export class AuthService {
   userData: any;
+
+  authError!: any;
+  public shareError = new BehaviorSubject<any>(this.authError);
 
   constructor(
     public afs: AngularFirestore,
@@ -51,7 +54,7 @@ export class AuthService {
         });
       })
       .catch((error) => {
-        window.alert(error.message);
+        this.setError(error);
       });
   }
 
@@ -64,7 +67,7 @@ export class AuthService {
         this.SetUserData(result.user);
       })
       .catch((error) => {
-        window.alert(error.message);
+        this.setError(error);
       });
   }
 
@@ -83,7 +86,7 @@ export class AuthService {
         window.alert('Password reset email sent, check your inbox');
       })
       .catch((error) => {
-        window.alert(error);
+        this.setError(error);
       });
   }
 
@@ -118,6 +121,8 @@ export class AuthService {
     const userData = {
       name: name,
       uid: user.uid,
+      createdAt: user.metadata.createdAt,
+      email: user.email,
     };
 
     this.dataService.addAppUser(userData);
@@ -127,6 +132,9 @@ export class AuthService {
     const userRef: AngularFirestoreDocument<any> = this.afs.doc(
       `users/${user.uid}`
     );
+
+    /*ToDo*/
+    //Created Falsch
 
     const userData: User = {
       uid: user.uid,
@@ -146,5 +154,10 @@ export class AuthService {
       localStorage.removeItem('user');
       this.router.navigate(['login']);
     });
+  }
+
+  setError(error: any) {
+    this.authError = error;
+    this.shareError.next(this.authError);
   }
 }

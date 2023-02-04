@@ -29,6 +29,9 @@
         <button type="submit" mat-raised-button color="primary">
           <mat-icon>login</mat-icon>Login with Google
         </button>
+        <mat-error *ngIf="myError"
+          ><strong>E-Mail oder Passwort nicht korrekt</strong></mat-error
+        >
         <span class="text-registerLink" [routerLink]="['/auth/register']">
           Klick hier zum registrieren</span
         >

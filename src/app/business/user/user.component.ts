@@ -1,7 +1,9 @@
 import * as auth from 'firebase/auth';
+import * as moment from 'moment';
 import { DataServiceService } from 'src/app/shared/service/data-service.service';
 
-import { AfterViewInit, Component } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { AfterViewInit, ChangeDetectorRef, Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Observable } from '@firebase/util';
 
@@ -12,6 +14,7 @@ import { AuthService } from '../../shared/service/auth.service';
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss'],
+  providers: [DatePipe],
 })
 export class UserComponent implements AfterViewInit {
   userForm: FormGroup;
@@ -20,35 +23,75 @@ export class UserComponent implements AfterViewInit {
   constructor(
     private fb: FormBuilder,
     public authService: AuthService,
-    private dataService: DataServiceService
+    private dataService: DataServiceService,
+    private changeDetectorRef: ChangeDetectorRef,
+    private datePipe: DatePipe
   ) {
     const uid = this.authService.userData.uid;
-
+    this.createUserForm();
     this.dataService
       .getAppUserByUid(uid)
       .snapshotChanges()
       .subscribe((user) => {
         this.myUser = user.payload.toJSON();
-        console.log(this.myUser, 'From Service');
+        console.log(this.myUser, 'Sub');
+        this.updateUserForm();
+        this.changeDetectorRef.detectChanges();
       });
+  }
 
-    this.myUser = this.authService.userData;
-    this.createUserForm(this.myUser);
+  get userId() {
+    return this.userForm.get('userId').value;
+  }
+
+  get userEmail() {
+    return this.userForm.get('userEmail').value;
+  }
+
+  get signSince() {
+    return this.myUser.createdAt;
+  }
+
+  get userName() {
+    return this.userForm.get('userName').value;
   }
 
   ngAfterViewInit() {}
 
-  createUserForm(user) {
+  createUserForm() {
     this.userForm = this.fb.group({
       userName: new FormControl(''),
-      userId: new FormControl(user.uid),
+      userId: new FormControl({ value: '', disabled: true }),
       signSince: new FormControl({ value: '', disabled: true }),
-      //userEmail: new FormControl({ value: '', disabled: true }),
-      userEmail: new FormControl(user.email),
+      userEmail: new FormControl({ value: '', disabled: true }),
+    });
+  }
+
+  updateUserForm() {
+    this.userForm.patchValue({
+      userName: this.myUser.name,
+      userId: this.myUser.uid,
+      signSince: this.datePipe.transform(
+        new Date(Number(this.myUser.createdAt)),
+        'dd.MM.yyyy'
+      ),
+      userEmail: this.myUser.email,
     });
   }
 
   submit(event: Event) {
-    console.log(this.userForm);
+    this.createMyUser();
+    console.log(this.myUser);
+    this.dataService.createOrUpdateAppUser(this.myUser);
+  }
+
+  createMyUser() {
+    this.myUser = {
+      id: this.userId,
+      name: this.userName,
+      uid: this.userId,
+      email: this.userEmail,
+      createdAt: this.signSince,
+    };
   }
 }

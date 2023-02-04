@@ -17,6 +17,7 @@ import { EmailValidation, PasswordValidation } from '../validators';
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
+  myError: any;
 
   constructor(
     private fb: FormBuilder,
@@ -26,6 +27,14 @@ export class LoginComponent implements OnInit {
     this.loginForm = this.fb.group({
       userEmail: new FormControl('', EmailValidation),
       userPassword: new FormControl('', PasswordValidation),
+    });
+
+    authService.shareError.subscribe((err) => {
+      if (err) {
+        console.log(err.message, 'Login');
+        console.log(err, 'Login2');
+        this.myError = err;
+      }
     });
   }
 
@@ -40,6 +49,6 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {}
 
   submit() {
-    this.authService.login(this.userEmail, this.userPassword);
+    const result = this.authService.login(this.userEmail, this.userPassword);
   }
 }

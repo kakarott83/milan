@@ -1,4 +1,4 @@
-import { getDatabase, limitToLast, query, ref } from 'firebase/database';
+import { child, getDatabase, limitToLast, query, ref } from 'firebase/database';
 import { Observable, of } from 'rxjs';
 import { Country } from 'src/app/models/country';
 import { Customer } from 'src/app/models/customer';
@@ -47,22 +47,25 @@ export class DataServiceService {
   }
 
   addAppUser(appUser: AppUser) {
-    this.userListRef.push({
-      name: appUser.name,
-      uid: appUser.uid,
-    });
+    this.userRef = this.db.object('/users/' + appUser.uid);
+    this.userRef.set(appUser);
   }
 
   createOrUpdateAppUser(appUser: AppUser) {
+    console.log(appUser.id);
     if (appUser.id !== '') {
       this.userRef.update({
         name: appUser.name,
         uid: appUser.uid,
+        email: appUser.email,
+        createdAt: appUser.createdAt,
       });
     } else {
       this.userListRef.push({
         name: appUser.name,
         uid: appUser.uid,
+        email: appUser.email,
+        createdAt: appUser.createdAt,
       });
     }
   }
@@ -185,8 +188,8 @@ export class DataServiceService {
     return this.customerListRef;
   }
 
-  getAppUserByUid(uid: string) {
-    this.userRef = this.db.object('/users/' + uid);
+  getAppUserByUid(id: string) {
+    this.userRef = this.db.object('/users/' + id);
     return this.userRef;
   }
 
