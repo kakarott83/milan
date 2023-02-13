@@ -1,4 +1,5 @@
 import { child, getDatabase, limitToLast, query, ref } from 'firebase/database';
+import { ToastrService } from 'ngx-toastr';
 import { Observable, of } from 'rxjs';
 import { Country } from 'src/app/models/country';
 import { Customer } from 'src/app/models/customer';
@@ -9,10 +10,16 @@ import {
 	AngularFireList,
 	AngularFireObject,
 } from '@angular/fire/compat/database';
+import {
+	AngularFirestore,
+	AngularFirestoreCollection,
+	AngularFirestoreDocument,
+} from '@angular/fire/compat/firestore';
 
 import { AppUser } from '../../models/appUser';
 import { Travel } from '../../models/travel';
 import { Worktime } from '../../models/worktime';
+import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root',
@@ -29,21 +36,95 @@ export class DataServiceService {
   userListRef: AngularFireList<any>;
   userRef: AngularFireObject<any>;
 
-  constructor(private db: AngularFireDatabase) {
+  private countriesDbPath = '/countries';
+  private customersDbPath = '/customers';
+  private travelsDbPath = '/travels';
+  private worktimesDbPath = '/worktimes';
+  fsCustomerRef: AngularFirestoreCollection<Customer>;
+  fsCountryRef: AngularFirestoreCollection<Country>;
+  fsTravelRef: AngularFirestoreCollection<Travel>;
+  fsWorktimeRef: AngularFirestoreCollection<Worktime>;
+
+  constructor(
+    private db: AngularFireDatabase,
+    private notification: NotificationService,
+    private firestore: AngularFirestore
+  ) {
     this.countryListRef = db.list('/countries');
     this.customerListRef = db.list('/customers');
     this.workTimeListRef = db.list('/worktimes');
     this.travelListRef = db.list('/travels');
     this.userListRef = db.list('/users');
+
+    this.fsCustomerRef = firestore.collection(this.customersDbPath);
+    this.fsCountryRef = firestore.collection(this.countriesDbPath);
+    this.fsTravelRef = firestore.collection(this.travelsDbPath);
+    this.fsWorktimeRef = firestore.collection(this.worktimesDbPath);
   }
 
   //Hinzufügen
   addCountry(country: Country) {
-    this.countryListRef.push({
+    return this.countryListRef.push({
       name: country.name,
       rate: country.rate,
       halfRate: country.halfRate,
     });
+  }
+
+  //Refernez https://www.bezkoder.com/angular-15-firestore-crud/
+  createCustomer(customer: Customer): any {
+    return this.fsCustomerRef.add({ ...customer });
+  }
+
+  createCountry(country: Country): any {
+    return this.fsCountryRef.add({ ...country });
+  }
+
+  createTravel(travel: Travel): any {
+    return this.fsCustomerRef.add({ ...travel });
+  }
+
+  createWorktime(worktime: Worktime): any {
+    return this.fsCustomerRef.add({ ...worktime });
+  }
+
+  getCustomers(): AngularFirestoreCollection<Customer> {
+    return this.fsCountryRef;
+  }
+  getCountries(): AngularFirestoreCollection<Country> {
+    return this.fsCountryRef;
+  }
+  getTravels(): AngularFirestoreCollection<Travel> {
+    return this.fsTravelRef;
+  }
+  getWorktimes(): AngularFirestoreCollection<Worktime> {
+    return this.fsWorktimeRef;
+  }
+
+  updateCustomer(id: string, data: any): Promise<void> {
+    return this.fsCustomerRef.doc(id).update(data);
+  }
+  updateCountry(id: string, data: any): Promise<void> {
+    return this.fsCountryRef.doc(id).update(data);
+  }
+  updateTravel(id: string, data: any): Promise<void> {
+    return this.fsTravelRef.doc(id).update(data);
+  }
+  updateWorktime(id: string, data: any): Promise<void> {
+    return this.fsWorktimeRef.doc(id).update(data);
+  }
+
+  deleteCustomerById(id: string): Promise<void> {
+    return this.fsCustomerRef.doc(id).delete();
+  }
+  deleteCountryById(id: string): Promise<void> {
+    return this.fsCountryRef.doc(id).delete();
+  }
+  deleteTravelById(id: string): Promise<void> {
+    return this.fsTravelRef.doc(id).delete();
+  }
+  deleteWorktimeById(id: string): Promise<void> {
+    return this.fsWorktimeRef.doc(id).delete();
   }
 
   addAppUser(appUser: AppUser) {
@@ -71,18 +152,41 @@ export class DataServiceService {
   }
 
   createOrUpdateCountry(country: Country) {
-    if (country.id !== '') {
-      this.countryRef.update({
-        name: country.name,
-        rate: country.rate,
-        halfRate: country.halfRate,
-      });
+    if (country.id.toString() !== '') {
+      this.countryRef
+        .update({
+          id: country.id,
+          name: country.name,
+          rate: country.rate,
+          halfRate: country.halfRate,
+        })
+        .then(() => {
+          this.notification.showSuccess('Land', 'Land erfolgreich gespeichert');
+        })
+        .catch((err) => {
+          console.log(err, 'DataService');
+          this.notification.showError(
+            'Land',
+            'Änderung konnte nicht gespeichert werden'
+          );
+        });
     } else {
-      this.countryListRef.push({
-        name: country.name,
-        rate: country.rate,
-        halfRate: country.halfRate,
-      });
+      this.countryListRef
+        .push({
+          name: country.name,
+          rate: country.rate,
+          halfRate: country.halfRate,
+        })
+        .then(() => {
+          this.notification.showSuccess('Land', 'Land erfolgreich gespeichert');
+        })
+        .catch((err) => {
+          console.log(err, 'DataService');
+          this.notification.showError(
+            'Land',
+            'Änderung konnte nicht gespeichert werden'
+          );
+        });
     }
   }
 
@@ -96,70 +200,154 @@ export class DataServiceService {
 
   createOrUpdateCustomer(customer: Customer) {
     if (customer.id !== '') {
-      this.customerRef.update({
-        city: customer.city,
-        name: customer.name,
-        country: customer.country,
-      });
+      this.customerRef
+        .update({
+          city: customer.city,
+          name: customer.name,
+          country: customer.country,
+        })
+        .then(() => {
+          this.notification.showSuccess(
+            'Kunde',
+            'Kunde erfolgreich gespeichert'
+          );
+        })
+        .catch((err) => {
+          console.log(err, 'DataService');
+          this.notification.showError(
+            'Kunde',
+            'Änderung konnte nicht gespeichert werden'
+          );
+        });
     } else
-      this.customerListRef.push({
-        city: customer.city,
-        name: customer.name,
-        country: customer.country,
-      });
+      this.customerListRef
+        .push({
+          city: customer.city,
+          name: customer.name,
+          country: customer.country,
+        })
+        .then(() => {
+          this.notification.showSuccess(
+            'Kunde',
+            'Kunde erfolgreich gespeichert'
+          );
+        })
+        .catch((err) => {
+          console.log(err, 'DataService');
+          this.notification.showError(
+            'Kunde',
+            'Änderung konnte nicht gespeichert werden'
+          );
+        });
   }
 
   createOrUpdateTravel(travel: Travel) {
     if (travel.id !== '' && travel.id !== undefined) {
-      this.travelRef.update({
-        start: travel.start,
-        end: travel.end,
-        spend: travel.spend,
-        customer: travel.customer,
-        rate: travel.rate,
-        spendValue: travel.spendValue,
-        total: travel.total,
-        catering: travel.catering,
-        reason: travel.reason,
-        userId: travel.userId,
-      });
+      this.travelRef
+        .update({
+          start: travel.start,
+          end: travel.end,
+          spend: travel.spend,
+          customer: travel.customer,
+          rate: travel.rate,
+          spendValue: travel.spendValue,
+          total: travel.total,
+          catering: travel.catering,
+          reason: travel.reason,
+          userId: travel.userId,
+        })
+        .then(() => {
+          this.notification.showSuccess(
+            'Reise',
+            'Reise erfolgreich gespeichert'
+          );
+        })
+        .catch((err) => {
+          console.log(err, 'DataService');
+          this.notification.showError(
+            'Reise',
+            'Änderung konnte nicht gespeichert werden'
+          );
+        });
     } else {
-      this.travelListRef.push({
-        start: travel.start,
-        end: travel.end,
-        spend: travel.spend,
-        customer: travel.customer,
-        rate: travel.rate,
-        spendValue: travel.spendValue,
-        total: travel.total,
-        catering: travel.catering,
-        reason: travel.reason,
-        userId: travel.userId,
-      });
+      this.travelListRef
+        .push({
+          start: travel.start,
+          end: travel.end,
+          spend: travel.spend,
+          customer: travel.customer,
+          rate: travel.rate,
+          spendValue: travel.spendValue,
+          total: travel.total,
+          catering: travel.catering,
+          reason: travel.reason,
+          userId: travel.userId,
+        })
+        .then(() => {
+          this.notification.showSuccess(
+            'Reise',
+            'Land erfolgreich gespeichert'
+          );
+        })
+        .catch((err) => {
+          console.log(err, 'DataService');
+          this.notification.showError(
+            'Reise',
+            'Änderung konnte nicht gespeichert werden'
+          );
+        });
     }
   }
 
   createOrUpdateWorkTime(worktime: Worktime) {
     if (worktime.id !== '') {
-      this.workTimeRef.update({
-        start: worktime.start,
-        end: worktime.end,
-        duration: worktime.duration,
-        break: worktime.break,
-        comment: worktime.comment,
-        userId: worktime.userId,
-        date: worktime.date,
-      });
+      this.workTimeRef
+        .update({
+          start: worktime.start,
+          end: worktime.end,
+          duration: worktime.duration,
+          break: worktime.break,
+          comment: worktime.comment,
+          userId: worktime.userId,
+          date: worktime.date,
+        })
+        .then(() => {
+          this.notification.showSuccess(
+            'Arbeitszeit',
+            'Arbeitszeit erfolgreich gespeichert'
+          );
+        })
+        .catch((err) => {
+          console.log(err, 'DataService');
+          this.notification.showError(
+            'Arbeitszeit',
+            'Änderung konnte nicht gespeichert werden'
+          );
+        });
     } else
-      this.workTimeListRef.push({
-        start: worktime.start,
-        end: worktime.end,
-        duration: worktime.duration,
-        break: worktime.break,
-        comment: worktime.comment,
-        userId: worktime.userId,
-        date: worktime.date,
-      });
+      this.workTimeListRef
+        .push({
+          start: worktime.start,
+          end: worktime.end,
+          duration: worktime.duration,
+          break: worktime.break,
+          comment: worktime.comment,
+          userId: worktime.userId,
+          date: worktime.date,
+        })
+        .then(() => {
+          this.notification.showSuccess(
+            'Arbeitszeit',
+            'Arbeitszeit erfolgreich gespeichert'
+          );
+        })
+        .catch((err) => {
+          console.log(err, 'DataService');
+          this.notification.showError(
+            'Arbeitszeit',
+            'Änderung konnte nicht gespeichert werden'
+          );
+        });
   }
 
   getCountryById(id: string) {
@@ -224,21 +412,65 @@ export class DataServiceService {
 
   deleteCountry(id: string) {
     this.countryRef = this.db.object('countries/' + id);
-    this.countryRef.remove();
+    this.countryRef
+      .remove()
+      .then(() => {
+        this.notification.showWarning('Land', 'Land gelöscht');
+      })
+      .catch((err) => {
+        console.log(err, 'DataService');
+        this.notification.showError(
+          'Land',
+          'Änderung konnte nicht gespeichert werden'
+        );
+      });
   }
 
   deleteWorktime(id: string) {
     this.workTimeRef = this.db.object('worktimes/' + id);
-    this.workTimeRef.remove();
+    this.workTimeRef
+      .remove()
+      .then(() => {
+        this.notification.showWarning('Arbeitszeit', 'Arbeitszeit gelöscht');
+      })
+      .catch((err) => {
+        console.log(err, 'DataService');
+        this.notification.showError(
+          'Arbeitszeit',
+          'Änderung konnte nicht gespeichert werden'
+        );
+      });
   }
 
   deleteTravel(id: string) {
     this.travelRef = this.db.object('travels/' + id);
-    this.travelRef.remove();
+    this.travelRef
+      .remove()
+      .then(() => {
+        this.notification.showWarning('Reise', 'Reise gelöscht');
+      })
+      .catch((err) => {
+        console.log(err, 'DataService');
+        this.notification.showError(
+          'Land',
+          'Änderung konnte nicht gespeichert werden'
+        );
+      });
   }
 
   deleteCustomer(id: string) {
     this.customerRef = this.db.object('customers/' + id);
-    this.customerRef.remove();
+    this.customerRef
+      .remove()
+      .then(() => {
+        this.notification.showWarning('Kunde', 'Kunde gelöscht');
+      })
+      .catch((err) => {
+        console.log(err, 'DataService');
+        this.notification.showError(
+          'Kunde',
+          'Änderung konnte nicht gespeichert werden'
+        );
+      });
   }
 }

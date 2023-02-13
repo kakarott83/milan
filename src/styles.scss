@@ -20,14 +20,8 @@ span {
   font-weight: 700;
 }
 
-table {
-  width: 100%;
-}
-
-.action-buttons {
-  display: flex;
-  justify-content: flex-end;
-}
+$primary-green: #39c486;
+$primary-white: #ffffff;
 
 .header-container-table {
   display: flex;

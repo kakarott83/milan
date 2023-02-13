@@ -74,6 +74,7 @@ export class CountryListComponent implements OnInit, AfterViewInit {
     console.log(id);
     this.dataSource.data.splice(rowId, 1);
     this.dataSource._updateChangeSubscription();
+    this.dataService.deleteCountry(id);
   }
 
   clearFilter(e: Event) {

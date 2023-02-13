@@ -18,6 +18,32 @@
         <input type="number" matInput formControlName="halfRate" />
       </mat-form-field>
     </div>
+    <div class="row">
+      <mat-form-field class="full-width">
+        <mat-label>Id</mat-label>
+        <input type="string" matInput formControlName="id" />
+      </mat-form-field>
+    </div>
+    <div class="row">
+      <mat-form-field class="full-width">
+        <mat-label>Name</mat-label>
+        <input
+          type="text"
+          matInput
+          formControlName="name"
+          [matAutocomplete]="auto"
+          (change)="filter()"
+        />
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option
+            *ngFor="let country of myCountries"
+            [value]="country.name.common"
+            ><img src="{{ country.flags[1] }}" height="15" />
+            {{ country.name.common }}</mat-option
+          >
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
     <div class="row btn-submit">
       <button
         type="submit"

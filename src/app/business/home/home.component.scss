@@ -1,0 +1,78 @@
+@import "../../../styles.scss";
+
+input,
+button,
+mat-label,
+h2,
+p,
+span {
+  font-family: "Ubuntu", sans-serif;
+  font-weight: 700;
+}
+
+.container {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  margin-left: 0;
+}
+
+.content {
+  margin-right: auto;
+  margin-left: auto;
+  width: 100%;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-clip: border-box;
+}
+
+.border-radius-xl {
+  border-radius: 0.75rem;
+}
+
+.icon-lg {
+  height: 64px;
+  width: 64px;
+}
+
+.icon-shape {
+  width: 48px;
+  height: 48px;
+  background-position: 50%;
+  border-radius: 0.5rem;
+}
+
+.bg-gradient-dark {
+  background-image: linear-gradient(195deg, $primary-green, $primary-white);
+}
+
+.shadow-dark {
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14),
+    0 7px 10px -5px rgba(64, 64, 64, 0.4) !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.mt-n4 {
+  margin-top: -2rem !important;
+}
+
+.position-absolute {
+  position: absolute !important;
+}
+
+.material-icons {
+  margin-top: 22%;
+}
+
+.opacity-10 {
+  opacity: 1 !important;
+}

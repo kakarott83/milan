@@ -133,9 +133,6 @@ export class AuthService {
       `users/${user.uid}`
     );
 
-    /*ToDo*/
-    //Created Falsch
-
     const userData: User = {
       uid: user.uid,
       email: user.email,

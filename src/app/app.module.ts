@@ -50,7 +50,11 @@ const routes: Routes = [
     AngularFireStorageModule,
     AngularFireDatabaseModule,
     RouterModule.forRoot(routes),
-    ToastrModule.forRoot(),
+    ToastrModule.forRoot({
+      closeButton: true,
+      timeOut: 1000, // 15 seconds
+      progressBar: true,
+    }),
   ],
 
   providers: [
