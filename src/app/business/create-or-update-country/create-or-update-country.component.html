@@ -1,59 +1,66 @@
 <div class="container">
-  <form [formGroup]="myCountryForm" (ngSubmit)="submit($event)">
-    <div class="row">
-      <mat-form-field class="full-width">
-        <mat-label>Name</mat-label>
-        <input type="text" matInput formControlName="name" />
-      </mat-form-field>
+  <div *ngIf="!loading; else loadData">
+    <form [formGroup]="myCountryForm" (ngSubmit)="submit($event)">
+      <div class="row">
+        <mat-form-field class="full-width">
+          <mat-label>Name</mat-label>
+          <input type="text" matInput formControlName="name" />
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field class="full-width">
+          <mat-label>Tagespauschale</mat-label>
+          <input type="number" matInput formControlName="rate" />
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field class="full-width">
+          <mat-label>Pauschale für An-und Abreise</mat-label>
+          <input type="number" matInput formControlName="halfRate" />
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field class="full-width">
+          <mat-label>Id</mat-label>
+          <input type="string" matInput formControlName="id" />
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field class="full-width">
+          <mat-label>Name</mat-label>
+          <input
+            type="text"
+            matInput
+            formControlName="name"
+            [matAutocomplete]="auto"
+            (change)="filter()"
+          />
+          <mat-autocomplete #auto="matAutocomplete">
+            <mat-option
+              *ngFor="let country of myCountries"
+              [value]="country.name.common"
+              ><img src="{{ country.flags[1] }}" height="15" />
+              {{ country.name.common }}</mat-option
+            >
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+      <div class="row btn-submit">
+        <button
+          type="submit"
+          class="full-width"
+          mat-raised-button
+          color="primary"
+        >
+          <mat-icon>save</mat-icon>Speichern
+        </button>
+      </div>
+    </form>
+    <div>{{ myCountryForm.value | json }}</div>
+  </div>
+  <ng-template #loadData>
+    <div class="load-Data">
+      <mat-spinner diameter="40"></mat-spinner>
     </div>
-    <div class="row">
-      <mat-form-field class="full-width">
-        <mat-label>Tagespauschale</mat-label>
-        <input type="number" matInput formControlName="rate" />
-      </mat-form-field>
-    </div>
-    <div class="row">
-      <mat-form-field class="full-width">
-        <mat-label>Pauschale für An-und Abreise</mat-label>
-        <input type="number" matInput formControlName="halfRate" />
-      </mat-form-field>
-    </div>
-    <div class="row">
-      <mat-form-field class="full-width">
-        <mat-label>Id</mat-label>
-        <input type="string" matInput formControlName="id" />
-      </mat-form-field>
-    </div>
-    <div class="row">
-      <mat-form-field class="full-width">
-        <mat-label>Name</mat-label>
-        <input
-          type="text"
-          matInput
-          formControlName="name"
-          [matAutocomplete]="auto"
-          (change)="filter()"
-        />
-        <mat-autocomplete #auto="matAutocomplete">
-          <mat-option
-            *ngFor="let country of myCountries"
-            [value]="country.name.common"
-            ><img src="{{ country.flags[1] }}" height="15" />
-            {{ country.name.common }}</mat-option
-          >
-        </mat-autocomplete>
-      </mat-form-field>
-    </div>
-    <div class="row btn-submit">
-      <button
-        type="submit"
-        class="full-width"
-        mat-raised-button
-        color="primary"
-      >
-        <mat-icon>save</mat-icon>Speichern
-      </button>
-    </div>
-  </form>
-  <div>{{ myCountryForm.value | json }}</div>
+  </ng-template>
 </div>

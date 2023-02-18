@@ -1,30 +1,26 @@
+import { map, tap } from 'rxjs/operators';
 import { Country } from 'src/app/models/country';
 
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Customer } from '../../models/customer';
 import { DataServiceService } from '../../shared/service/data-service.service';
 
-const countryList = [
-  { name: 'Schweiz', rate: 64, halfRate: 32 },
-  { name: 'Österreich', rate: 24, halfRate: 12 },
-  { name: 'Deutschland', rate: 24, halfRate: 12 },
-];
-
 @Component({
   selector: 'app-create-or-update-customer',
   templateUrl: './create-or-update-customer.component.html',
   styleUrls: ['./create-or-update-customer.component.scss'],
 })
-export class CreateOrUpdateCustomerComponent implements OnInit, AfterViewInit {
+export class CreateOrUpdateCustomerComponent implements OnInit {
   myCustomer: Customer = {};
   myCustomerForm: FormGroup;
   myCustomerList: Customer[] = [{}];
-  countryList = countryList;
+  countryList = {};
   countries: Country[];
   loading = false;
+  id = '';
   //selectCountry: any[];
 
   constructor(
@@ -38,24 +34,18 @@ export class CreateOrUpdateCustomerComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.createCustomerForm();
-    const id = this.activeRoute.snapshot.paramMap.get('id');
-    if (id !== null) {
+    this.id = this.activeRoute.snapshot.paramMap.get('id');
+    if (this.id !== null) {
       this.dataService
-        .getCustomerById(id)
-        .snapshotChanges()
-        .subscribe((data) => {
-          this.myCustomer = data.payload.toJSON();
-          this.myCustomerForm.patchValue({
-            name: this.myCustomer.name,
-            city: this.myCustomer.city,
-          });
-          const toSelectCountry = this.myCustomer.country;
-          this.myCustomerForm.get('country').setValue(toSelectCountry);
+        .getCustomerById(this.id)
+        .valueChanges()
+        .pipe(tap((data) => console.log(data)))
+        .subscribe((item) => {
+          this.createCustomerForm(item);
+          this.loading = false;
         });
     }
   }
-
-  ngAfterViewInit(): void {}
 
   get name() {
     return this.myCustomerForm.get('name')?.value;
@@ -71,17 +61,30 @@ export class CreateOrUpdateCustomerComponent implements OnInit, AfterViewInit {
 
   submit(e: Event) {
     this.createCustomer();
-    console.log(this.myCustomer);
-    this.dataService.addCustomer(this.myCustomer);
+    if (this.id) {
+      this.dataService.updateCustomer(this.id, this.myCustomer);
+    } else {
+      this.dataService.createCustomer(this.myCustomer);
+    }
     this.router.navigate(['business/customer-list']);
   }
 
-  createCustomerForm() {
-    this.myCustomerForm = this.fb.group({
-      name: [this.myCustomer.name],
-      city: [this.myCustomer.city],
-      country: [''],
-    });
+  createCustomerForm(customer?: Customer) {
+    if (customer) {
+      this.myCustomerForm = this.fb.group({
+        name: new FormControl(customer.name),
+        city: new FormControl(customer.city),
+        id: new FormControl({ value: this.id, disabled: true }),
+        country: new FormControl(customer.country),
+      });
+    } else {
+      this.myCustomerForm = this.fb.group({
+        name: new FormControl(''),
+        city: new FormControl(''),
+        id: new FormControl(''),
+        country: [''],
+      });
+    }
   }
 
   createCustomer() {
@@ -93,16 +96,22 @@ export class CreateOrUpdateCustomerComponent implements OnInit, AfterViewInit {
   }
 
   getCountryList() {
-    let c = this.dataService.getCountryList();
-    this.loading = true;
-    c.snapshotChanges().subscribe((data) => {
-      this.countries = [];
-      data.forEach((item) => {
-        let x = item.payload.toJSON();
-        this.countries.push(x as Country);
+    this.dataService
+      .getCountries()
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((a) => {
+            const data = a.payload.doc.data() as Country;
+            data.id = a.payload.doc.id;
+            return { ...data };
+          })
+        ),
+        tap((dates) => console.log(dates, 'Tap'))
+      )
+      .subscribe((dates) => {
+        this.countries = dates;
       });
-      this.loading = false;
-    });
   }
 
   isSameCountry(country1: Country, country2: Country): boolean {

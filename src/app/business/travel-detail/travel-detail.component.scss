@@ -1,0 +1,14 @@
+.card-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.list-title {
+  width: 100%;
+}
+
+.list-value {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+}

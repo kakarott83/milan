@@ -1,19 +1,20 @@
 import { child, getDatabase, limitToLast, query, ref } from 'firebase/database';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Country } from 'src/app/models/country';
 import { Customer } from 'src/app/models/customer';
 
 import { Injectable } from '@angular/core';
 import {
-	AngularFireDatabase,
-	AngularFireList,
-	AngularFireObject,
+  AngularFireDatabase,
+  AngularFireList,
+  AngularFireObject,
 } from '@angular/fire/compat/database';
 import {
-	AngularFirestore,
-	AngularFirestoreCollection,
-	AngularFirestoreDocument,
+  AngularFirestore,
+  AngularFirestoreCollection,
+  AngularFirestoreDocument,
 } from '@angular/fire/compat/firestore';
 
 import { AppUser } from '../../models/appUser';
@@ -81,7 +82,7 @@ export class DataServiceService {
   }
 
   createTravel(travel: Travel): any {
-    return this.fsCustomerRef.add({ ...travel });
+    return this.fsTravelRef.add({ ...travel });
   }
 
   createWorktime(worktime: Worktime): any {
@@ -89,7 +90,7 @@ export class DataServiceService {
   }
 
   getCustomers(): AngularFirestoreCollection<Customer> {
-    return this.fsCountryRef;
+    return this.fsCustomerRef;
   }
   getCountries(): AngularFirestoreCollection<Country> {
     return this.fsCountryRef;
@@ -351,18 +352,19 @@ export class DataServiceService {
   }
 
   getCountryById(id: string) {
-    this.countryRef = this.db.object('/countries/' + id);
-    return this.countryRef;
+    return this.fsCountryRef.doc(id);
   }
 
   getCustomerById(id: string) {
-    this.customerRef = this.db.object('/customers/' + id);
-    return this.customerRef;
+    return this.fsCustomerRef.doc(id);
   }
 
   getTravelById(id: string) {
-    this.travelRef = this.db.object('/travels/' + id);
-    return this.travelRef;
+    return this.fsTravelRef.doc(id);
+  }
+
+  getWorkTimeById(id: string) {
+    return this.fsWorktimeRef.doc(id);
   }
 
   //Listen abrufen
@@ -403,11 +405,6 @@ export class DataServiceService {
   getTravelList() {
     this.travelListRef = this.db.list('travels');
     return this.travelListRef;
-  }
-
-  getWorkTimeById(id: string) {
-    this.workTimeRef = this.db.object('/worktimes/' + id);
-    return this.workTimeRef;
   }
 
   deleteCountry(id: string) {

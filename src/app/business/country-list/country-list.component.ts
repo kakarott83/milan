@@ -1,3 +1,4 @@
+import { map, tap } from 'rxjs/operators';
 import { Country } from 'src/app/models/country';
 
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
@@ -7,12 +8,6 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 
 import { DataServiceService } from '../../shared/service/data-service.service';
-
-// const countries: Country[] = [
-//   { id: '1', name: 'Schweiz', rate: 64, halfRate: 32 },
-//   { id: '2', name: 'Österreich', rate: 24, halfRate: 12 },
-//   { id: '3', name: 'Deutschland', rate: 24, halfRate: 12 },
-// ];
 
 @Component({
   selector: 'app-country-list',
@@ -30,23 +25,12 @@ export class CountryListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private router: Router, public dataService: DataServiceService) {
-    let c = dataService.getCountryList();
-    this.loading = true;
-    c.snapshotChanges().subscribe((data) => {
-      this.countries = [];
-      data.forEach((item) => {
-        let x = item.payload.toJSON();
-        x['id'] = item.key;
-        this.countries.push(x as Country);
-      });
-      console.log(this.countries);
-      this.dataSource.data = this.countries;
-      this.loading = false;
-    });
-  }
+  constructor(private router: Router, public dataService: DataServiceService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loading = true;
+    this.getCountries();
+  }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
@@ -70,15 +54,34 @@ export class CountryListComponent implements OnInit, AfterViewInit {
   }
 
   deleteCountry(rowId: number, id: string) {
-    console.log(rowId);
-    console.log(id);
     this.dataSource.data.splice(rowId, 1);
     this.dataSource._updateChangeSubscription();
-    this.dataService.deleteCountry(id);
+    this.dataService.deleteCountryById(id);
   }
 
   clearFilter(e: Event) {
     this.filterValue = '';
     this.dataSource.filter = '';
+  }
+
+  getCountries() {
+    this.dataService
+      .getCountries()
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((a) => {
+            const data = a.payload.doc.data() as Country;
+            data.id = a.payload.doc.id;
+            return { ...data };
+          })
+        ),
+        tap((dates) => console.log(dates, 'Tap'))
+      )
+      .subscribe((dates) => {
+        this.countries = dates;
+        this.dataSource.data = this.countries;
+        this.loading = false;
+      });
   }
 }

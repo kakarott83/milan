@@ -18,6 +18,7 @@ import { SpendListComponent } from './spend-list/spend-list.component';
 import { TravelListComponent } from './travel-list/travel-list.component';
 import { UserComponent } from './user/user.component';
 import { WorktimeComponent } from './worktime/worktime.component';
+import { TravelDetailComponent } from './travel-detail/travel-detail.component';
 
 const routes: Routes = [
   {
@@ -59,6 +60,7 @@ const routes: Routes = [
     CustomerListComponent,
     CreateOrUpdateCountryComponent,
     CountryListComponent,
+    TravelDetailComponent,
   ],
   imports: [
     CommonModule,

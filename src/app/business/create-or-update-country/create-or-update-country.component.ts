@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { map, startWith, tap } from 'rxjs/operators';
 
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
@@ -22,6 +22,8 @@ export class CreateOrUpdateCountryComponent implements OnInit {
   myCountries: any;
   filteredCountry: Observable<any[]>;
   countryControl = new FormControl();
+  loading = false;
+  id = '';
 
   constructor(
     private fb: FormBuilder,
@@ -31,30 +33,24 @@ export class CreateOrUpdateCountryComponent implements OnInit {
     private router: Router,
     private activeRoute: ActivatedRoute
   ) {
-    this.getCountries();
-    const id = activeRoute.snapshot.paramMap.get('id');
-    if (id !== '') {
-      let c = dataService.getCountryById(id);
-      c.snapshotChanges().subscribe((country) => {
-        this.myCountry = country.payload.toJSON();
-        if (country.key !== null) {
-          this.myCountry.id = country.key.toString();
-        }
-        this.createCountryForm(this.myCountry);
-      });
-    } else {
-      this.createCountryForm();
-    }
-
-    this.myCountryForm = fb.group({
-      name: new FormControl(''),
-      rate: new FormControl(''),
-      halfRate: new FormControl(''),
-      id: new FormControl(''),
-    });
+    this.createCountryForm();
   }
 
   ngOnInit(): void {
+    this.getCountries();
+    this.id = this.activeRoute.snapshot.paramMap.get('id');
+    //this.createCountryForm();
+    if (this.id !== '') {
+      this.dataService
+        .getCountryById(this.id)
+        .valueChanges()
+        .pipe(tap((data) => console.log(data)))
+        .subscribe((item) => {
+          this.createCountryForm(item);
+          this.loading = false;
+        });
+    }
+
     this.filteredCountry = this.countryControl.valueChanges.pipe(
       startWith(''),
       map((value) => this._filter(value || ''))
@@ -70,10 +66,6 @@ export class CreateOrUpdateCountryComponent implements OnInit {
     return this.myCountryForm.get('name')?.value;
   }
 
-  get id() {
-    return this.myCountryForm.get('id')?.value;
-  }
-
   get rate() {
     return this.myCountryForm.get('rate')?.value;
   }
@@ -84,7 +76,11 @@ export class CreateOrUpdateCountryComponent implements OnInit {
   submit(e: Event) {
     this.createCountry();
     //this.dataService.createOrUpdateCountry(this.myCountry);
-    this.dataService.createCountry(this.myCountry);
+    if (this.id) {
+      this.dataService.updateCountry(this.id, this.myCountry);
+    } else {
+      this.dataService.createCountry(this.myCountry);
+    }
     this.router.navigate(['business/country-list']);
   }
 
@@ -94,7 +90,7 @@ export class CreateOrUpdateCountryComponent implements OnInit {
         name: new FormControl(country.name),
         rate: new FormControl(country.rate),
         halfRate: new FormControl(country.halfRate),
-        id: new FormControl({ value: country.id, disabled: true }),
+        id: new FormControl({ value: this.id, disabled: true }),
       });
     } else {
       this.myCountryForm = this.fb.group({

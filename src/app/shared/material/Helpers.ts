@@ -64,10 +64,13 @@ export class Helpers {
   }
 
   static dateTime(date: Date, time: string): Date {
-    let t = time.split(':');
-    date.setHours(Number(t[0]));
-    date.setMinutes(Number(t[1]));
-    return date;
+    if (date && time) {
+      let t = time.split(':');
+      date.setHours(Number(t[0]));
+      date.setMinutes(Number(t[1]));
+      return date;
+    }
+    return new Date();
   }
 
   static calcDiffinMinutes(start: Date, end: Date): number {

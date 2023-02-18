@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import { map, Observable, startWith } from 'rxjs';
+import { map, Observable, startWith, tap } from 'rxjs';
 import { Customer } from 'src/app/models/customer';
 import { Helpers } from 'src/app/shared/material/Helpers';
 import { DataServiceService } from 'src/app/shared/service/data-service.service';
@@ -8,9 +8,9 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import {
-	MAT_DIALOG_DATA,
-	MatDialog,
-	MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogRef,
 } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -37,7 +37,7 @@ export class CreateOrUpdateTravelComponent implements OnInit {
   myTravel!: Travel;
   mySpends: Spend[] = [{}];
   customerList: Customer[] = [];
-  myCatering: Catering;
+  myCatering: Catering = { breakfast: true, launch: false, dinner: false };
   filteredCustomer!: Observable<Customer[]>;
   city: string = '';
   dataFromDialog: any;
@@ -55,6 +55,8 @@ export class CreateOrUpdateTravelComponent implements OnInit {
   endDate;
   sDate;
   travelId;
+  id;
+  loading = false;
 
   constructor(
     private router: Router,
@@ -67,57 +69,6 @@ export class CreateOrUpdateTravelComponent implements OnInit {
   ) {
     this.getCustomer();
     this.createTravelForm();
-    const id = this.activeRoute.snapshot.paramMap.get('id');
-    if (id != null) {
-      //console.log(id);
-      this.travelId = id;
-      this.dataService
-        .getTravelById(id)
-        .snapshotChanges()
-        .subscribe((data) => {
-          this.myTravel = data.payload.toJSON();
-          this.startDate = new Date(this.myTravel.start);
-          this.endDate = new Date(this.myTravel.end);
-          this.city = this.myTravel.customer.city;
-          this.reasonValue = this.myTravel.reason;
-
-          //Array befüllen
-          if (this.myTravel.spend !== undefined) {
-            let v = this.myTravel.spend;
-            let s = [];
-            Object.keys(v).map(function (key) {
-              s.push({ [key]: v[key] });
-              return s;
-            });
-
-            for (let index = 0; index < s.length; index++) {
-              let element: Spend = s[index][index];
-              this.addSpend(element);
-            }
-          }
-
-          this.myTravelForm.patchValue({
-            startTime: this.formatTime(new Date(this.myTravel.start)),
-            endTime: this.formatTime(new Date(this.myTravel.end)),
-            breakfast: this.myTravel.catering.breakfast,
-            launch: this.myTravel.catering.launch,
-            dinner: this.myTravel.catering.dinner,
-            spendValue: this.myTravel.spendValue,
-          });
-
-          this.rate = this.myTravel.rate;
-          this.total = this.myTravel.total;
-
-          const toSelectCustomer = this.myTravel.customer;
-          this.myTravelForm.get('selectCustomer').setValue(toSelectCustomer);
-
-          const toSelectReason = this.myTravel.reason;
-          this.myTravelForm.get('reason').setValue(toSelectReason);
-
-          console.log(this.myTravelForm.value);
-        });
-    }
-
     this.myDatePipe = datePipe;
 
     this.onChanges();
@@ -208,18 +159,41 @@ export class CreateOrUpdateTravelComponent implements OnInit {
     return this.myTravelForm.valid;
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.id = this.activeRoute.snapshot.paramMap.get('id');
+    if (this.id) {
+      this.loading = true;
+      this.dataService
+        .getTravelById(this.id)
+        .valueChanges()
+        .pipe(tap((data) => console.log(data)))
+        .subscribe((item) => {
+          console.log(item, 'Item');
+          this.createTravelForm(item);
+          this.rate = item.rate;
+          this.total = item.total;
+          this.spendValue = item.spendValue;
+          this.loading = false;
+          this.createMyTravel();
+          this.onChanges();
+        });
+    }
+  }
 
-  submitTravel(event: any) {
+  submit(event: any) {
     this.createMyTravel();
-    console.log(this.myTravel, 'MyTravel');
-    this.dataService.createOrUpdateTravel(this.myTravel);
+    if (this.id) {
+      this.dataService.updateTravel(this.id, this.myTravel);
+    } else {
+      this.dataService.createTravel(this.myTravel);
+    }
     this.router.navigate(['/business/travel-list']);
   }
 
   createMyTravel() {
-    console.log(this.mySpends);
-    this.mySpends.map((x) => (x.date = x.date.toString()));
+    /*if (this.spends.length > 0) {
+      this.mySpends.map((x) => (x.date = x.date.toString()));
+    }*/
     this.myTravel = {
       start: Helpers.dateTime(this.start as Date, this.startTime).toString(),
       end: Helpers.dateTime(this.end as Date, this.endTime).toString(),
@@ -237,37 +211,67 @@ export class CreateOrUpdateTravelComponent implements OnInit {
     };
   }
 
-  createTravelForm() {
-    this.myTravelForm = this.fb.group({
-      start: [''],
-      startTime: [''],
-      end: [''],
-      endTime: [''],
-      reason: [''],
-      selectCustomer: [''],
-      spends: this.fb.array([]),
-      breakfast: [true],
-      launch: [false],
-      dinner: [false],
-    });
+  /*ToDo Catering setzen*/
+  createTravelForm(travel?: Travel) {
+    if (travel) {
+      this.myTravelForm = this.fb.group({
+        start: new FormControl(new Date(travel.start)),
+        startTime: new FormControl(this.formatTime(new Date(travel.start))),
+        end: new FormControl(new Date(travel.end)),
+        endTime: new FormControl(this.formatTime(new Date(travel.end))),
+        reason: new FormControl(travel.reason),
+        selectCustomer: new FormControl(travel.customer),
+        spends: this.fb.array(
+          travel.spend !== undefined
+            ? travel.spend.map((spend) => this.newSpend(spend))
+            : []
+        ),
+        breakfast: new FormControl(travel.catering.breakfast),
+        launch: new FormControl(travel.catering.launch),
+        dinner: new FormControl(travel.catering.dinner),
+      });
+    } else {
+      this.myTravelForm = this.fb.group({
+        start: new FormControl(''),
+        startTime: new FormControl(''),
+        end: new FormControl(''),
+        endTime: new FormControl(''),
+        reason: new FormControl(''),
+        selectCustomer: new FormControl(''),
+        spends: this.fb.array([]),
+        breakfast: new FormControl(true),
+        launch: new FormControl(false),
+        dinner: new FormControl(false),
+      });
+    }
   }
 
   onChanges() {
     this.myTravelForm.valueChanges.subscribe((val) => {
+      console.log(this.myTravelForm.value, 'ChangesEvent');
       this.setValue();
+      this.createMyTravel();
+      console.log(this.myTravel, 'MyTravel');
     });
   }
 
   getCustomer() {
-    let c = this.dataService.getCustomerList();
-
-    c.snapshotChanges().subscribe((data) => {
-      this.customerList = [];
-      data.forEach((item) => {
-        let x = item.payload.toJSON();
-        this.customerList.push(x as Customer);
+    this.dataService
+      .getCustomers()
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((a) => {
+            const data = a.payload.doc.data() as Customer;
+            data.id = a.payload.doc.id;
+            return { ...data };
+          })
+        ),
+        tap((dates) => console.log(dates, 'Tap'))
+      )
+      .subscribe((dates) => {
+        this.customerList = dates;
       });
-    });
   }
 
   newSpend(dates: any): FormGroup {
@@ -285,9 +289,9 @@ export class CreateOrUpdateTravelComponent implements OnInit {
     return customer && customer.name ? customer.name : '';
   }
 
-  addSpend(dates: any) {
-    console.log(dates.date, 'Dates');
+  addSpend(dates: any): void {
     this.spends.push(this.newSpend(dates));
+    console.log(this.spends, 'Spend');
   }
 
   removeSpend(i: number) {
@@ -309,6 +313,9 @@ export class CreateOrUpdateTravelComponent implements OnInit {
     this.spendValue = v;
 
     //Spends setzen
+    if (this.start !== '') {
+      this.startDate = this.start;
+    }
 
     //Zeiten berechnen und Erstattung summieren
     if (

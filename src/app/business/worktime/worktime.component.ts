@@ -1,10 +1,11 @@
 import * as moment from 'moment';
+import { catchError, map, startWith, switchMap, tap } from 'rxjs/operators';
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import {
-	MatCalendar,
-	MatCalendarCellCssClasses,
+  MatCalendar,
+  MatCalendarCellCssClasses,
 } from '@angular/material/datepicker';
 
 import { Worktime } from '../../models/worktime';
@@ -32,6 +33,7 @@ export class WorktimeComponent implements OnInit {
   infoDate: any;
   infoWt: any;
   infoBreak: any;
+  workTimes: Worktime[];
 
   workTimeForm: FormGroup;
 
@@ -70,7 +72,8 @@ export class WorktimeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('Init');
+    this.loading = true;
+    this.getWorktime();
   }
 
   submit(event: Event) {
@@ -139,7 +142,7 @@ export class WorktimeComponent implements OnInit {
     console.log(event);
   }
 
-  getWorktime() {
+  /*getWorktime() {
     let t = this.dataService.getWorkTimeListByUser(this.userid);
     this.loading = true;
     t.snapshotChanges().subscribe((data) => {
@@ -155,6 +158,26 @@ export class WorktimeComponent implements OnInit {
       this.calendar.updateTodaysDate();
       this.loading = false;
     });
+  }*/
+
+  getWorktime() {
+    this.dataService
+      .getWorktimes()
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((a) => {
+            const data = a.payload.doc.data() as Worktime;
+            data.id = a.payload.doc.id;
+            return { ...data };
+          })
+        ),
+        tap((dates) => console.log(dates, 'Tap'))
+      )
+      .subscribe((dates) => {
+        this.workTimes = dates;
+        this.loading = false;
+      });
   }
 
   changeSelectedDate(event?: Event) {
@@ -170,8 +193,8 @@ export class WorktimeComponent implements OnInit {
           .getWorkTimeById(this.selectedWt.id)
           .snapshotChanges()
           .subscribe((item) => {
-            let x = item.payload.toJSON();
-            x['id'] = item.key;
+            let x = item.payload.data();
+            x['id'] = item.payload.id;
             this.myWorktime = x as Worktime;
             console.log(this.myWorktime, 'MyWorktime');
             this.createWorkTimeForm(this.myWorktime);

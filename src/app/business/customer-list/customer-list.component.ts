@@ -1,3 +1,4 @@
+import { catchError, map, startWith, switchMap, tap } from 'rxjs/operators';
 import { DataServiceService } from 'src/app/shared/service/data-service.service';
 
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
@@ -7,27 +8,6 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 
 import { Customer } from '../../models/customer';
-
-const customer = [
-  {
-    id: '4711',
-    city: 'Horgen',
-    name: 'Bank-now',
-    country: { name: 'Schweiz', rate: 64, halfRate: 32 },
-  },
-  {
-    id: '4712',
-    city: 'Linz',
-    name: 'Oberbank',
-    country: { name: 'Österreich', rate: 24, halfRate: 12 },
-  },
-  {
-    id: '4713',
-    city: 'Grünwald',
-    name: 'AIL',
-    country: { name: 'Deutschland', rate: 24, halfRate: 12 },
-  },
-];
 
 @Component({
   selector: 'app-customer-list',
@@ -44,23 +24,12 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private router: Router, public dataService: DataServiceService) {
-    let c = dataService.getCustomerList();
-    this.loading = true;
-    c.snapshotChanges().subscribe((data) => {
-      this.customers = [];
-      data.forEach((item) => {
-        let x = item.payload.toJSON();
-        x['id'] = item.key;
-        this.customers.push(x as Customer);
-      });
-      console.log(this.customers);
-      this.dataSource.data = this.customers;
-      this.loading = false;
-    });
-  }
+  constructor(private router: Router, public dataService: DataServiceService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loading = true;
+    this.getCustomer();
+  }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
@@ -88,10 +57,32 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
     console.log(id);
     this.dataSource.data.splice(rowId, 1);
     this.dataSource._updateChangeSubscription();
+    this.dataService.deleteCustomerById(id);
   }
 
   clearFilter(e: Event) {
     this.filterValue = '';
     this.dataSource.filter = '';
+  }
+
+  getCustomer() {
+    this.dataService
+      .getCustomers()
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((a) => {
+            const data = a.payload.doc.data() as Customer;
+            data.id = a.payload.doc.id;
+            return { ...data };
+          })
+        ),
+        tap((dates) => console.log(dates, 'Tap'))
+      )
+      .subscribe((dates) => {
+        this.customers = dates;
+        this.dataSource.data = this.customers;
+        this.loading = false;
+      });
   }
 }

@@ -1,5 +1,5 @@
 import { from, merge, Observable, of as observableOf } from 'rxjs';
-import { catchError, map, startWith, switchMap } from 'rxjs/operators';
+import { catchError, map, startWith, switchMap, tap } from 'rxjs/operators';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
@@ -44,7 +44,7 @@ export class TravelListComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {}
 
   ngAfterViewInit(): void {
-    this.getData();
+    this.getTravel();
   }
 
   applyFilter(filter: string) {
@@ -53,7 +53,7 @@ export class TravelListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async getData() {
+  /*async getData() {
     //this.loading = true;
     let t = await this.dataService.getTravelListByUser(this.userId);
 
@@ -70,7 +70,7 @@ export class TravelListComponent implements OnInit, AfterViewInit {
     });
 
     this.loading = false;
-  }
+  }*/
 
   createTravel() {
     this.router.navigate(['business/createTravel']);
@@ -98,6 +98,27 @@ export class TravelListComponent implements OnInit, AfterViewInit {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.length;
     return numSelected === numRows;
+  }
+
+  getTravel() {
+    this.dataService
+      .getTravels()
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((a) => {
+            const data = a.payload.doc.data() as Travel;
+            data.id = a.payload.doc.id;
+            return { ...data };
+          })
+        ),
+        tap((dates) => console.log(dates, 'Tap'))
+      )
+      .subscribe((dates) => {
+        this.travels = dates;
+        this.dataSource.data = this.travels;
+        this.loading = false;
+      });
   }
 
   /** Selects all rows if they are not all selected; otherwise clear selection. */

@@ -1,0 +1,60 @@
+<div class="containter">
+  <mat-card>
+    <mat-card-header>
+      <div>
+        <h2>Information</h2>
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="card-info">
+        <div class="duration">{{ durDays }} Tag(e) {{ durHours }} Stunden</div>
+        <mat-divider></mat-divider>
+        <mat-grid-list cols="2" rowHeight="3:1">
+          <mat-grid-tile>
+            <div class="list-title">Pauschale</div>
+          </mat-grid-tile>
+          <mat-grid-tile>
+            <div class="list-value">
+              {{ rate | currency : "EUR" : "code" }}
+            </div>
+          </mat-grid-tile>
+          <mat-grid-tile><div class="list-title">Ausgaben</div></mat-grid-tile>
+          <mat-grid-tile>
+            <div class="list-value">
+              {{ spendValue | currency : "EUR" : "code" }}
+            </div>
+          </mat-grid-tile>
+          <mat-grid-tile
+            ><div class="list-title">
+              <b>Gesamt</b>
+            </div></mat-grid-tile
+          >
+          <mat-grid-tile
+            ><div class="list-value">
+              {{ total | currency : "EUR" : "code" }}
+            </div></mat-grid-tile
+          >
+        </mat-grid-list>
+      </div>
+      <mat-divider></mat-divider>
+      <mat-grid-list cols="2" rowHeight="3:1">
+        <mat-grid-tile
+          ><div class="list-title">
+            <b>UserId</b>
+          </div></mat-grid-tile
+        >
+        <mat-grid-tile
+          ><div class="list-value">{{ userId }}</div></mat-grid-tile
+        >
+        <mat-grid-tile
+          ><div class="list-title">
+            <b>TravelId</b>
+          </div></mat-grid-tile
+        >
+        <mat-grid-tile
+          ><div class="list-value">{{ id }}</div></mat-grid-tile
+        >
+      </mat-grid-list>
+    </mat-card-content>
+  </mat-card>
+</div>
