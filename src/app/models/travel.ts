@@ -17,4 +17,6 @@ export interface Travel {
   launch?: boolean;
   dinner?: boolean;
   reason?: string;
+  isSubmitted?: boolean;
+  isPaid?: boolean;
 }

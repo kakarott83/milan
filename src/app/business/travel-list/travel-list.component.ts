@@ -1,5 +1,12 @@
 import { from, merge, Observable, of as observableOf } from 'rxjs';
-import { catchError, map, startWith, switchMap, tap } from 'rxjs/operators';
+import {
+  catchError,
+  filter,
+  map,
+  startWith,
+  switchMap,
+  tap,
+} from 'rxjs/operators';
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
@@ -53,25 +60,6 @@ export class TravelListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /*async getData() {
-    //this.loading = true;
-    let t = await this.dataService.getTravelListByUser(this.userId);
-
-    t.snapshotChanges().subscribe((data) => {
-      this.travels = [];
-      data.forEach((item) => {
-        let x = item.payload.toJSON();
-        x['id'] = item.key;
-        this.travels.push(x as Travel);
-      });
-      this.dataSource.data = this.travels;
-      this.dataSource.sort = this.sort;
-      this.dataSource.paginator = this.paginator;
-    });
-
-    this.loading = false;
-  }*/
-
   createTravel() {
     this.router.navigate(['business/createTravel']);
   }
@@ -106,11 +94,13 @@ export class TravelListComponent implements OnInit, AfterViewInit {
       .snapshotChanges()
       .pipe(
         map((actions) =>
-          actions.map((a) => {
-            const data = a.payload.doc.data() as Travel;
-            data.id = a.payload.doc.id;
-            return { ...data };
-          })
+          actions
+            .map((a) => {
+              const data = a.payload.doc.data() as Travel;
+              data.id = a.payload.doc.id;
+              return { ...data };
+            })
+            .filter((t) => t.userId == this.userId)
         ),
         tap((dates) => console.log(dates, 'Tap'))
       )

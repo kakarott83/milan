@@ -1,72 +1,100 @@
 <div class="container">
-  <div class="row">
-    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-      <mat-card class="card">
-        <mat-card-content class="card-header">
-          <div
-            class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute"
-          >
-            <mat-icon matListItemIcon class="material-icons opacity-10"
-              >schedule</mat-icon
+  <div *ngIf="!loading; else loadData">
+    <div class="row">
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <mat-card class="card">
+          <mat-card-content class="card-header">
+            <div
+              class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute"
             >
-          </div>
-          <div class="text-end pt-1">
-            <h1 class="mb-1"><strong>36h</strong></h1>
-            <p>von 40h</p>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-      <mat-card class="card">
-        <mat-card-content class="card-header">
-          <div
-            class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute"
-          >
-            <mat-icon matListItemIcon class="material-icons opacity-10"
-              >schedule</mat-icon
+              <mat-icon matListItemIcon class="material-icons opacity-10"
+                >schedule</mat-icon
+              >
+            </div>
+            <div class="text-end pt-1">In dieser Woche bisher gearbeitet</div>
+            <div *ngIf="!loadingWeekTime; else loadData" class="text-end pt-1">
+              <h1 class="mb-1">
+                <strong>{{ weekTimeIs }}h</strong>
+              </h1>
+              <p>von {{ weekTime }}h</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <mat-card class="card">
+          <mat-card-content class="card-header">
+            <div
+              class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute"
             >
-          </div>
-          <div class="text-end pt-1">
-            <h1 class="mb-1"><strong>36h</strong></h1>
-            <p>von 40h</p>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-      <mat-card class="card">
-        <mat-card-content class="card-header">
-          <div
-            class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute"
-          >
-            <mat-icon matListItemIcon class="material-icons opacity-10"
-              >schedule</mat-icon
+              <mat-icon matListItemIcon class="material-icons opacity-10"
+                >flight_takeoff</mat-icon
+              >
+            </div>
+            <div class="text-end pt-1">Letzte Reise zu</div>
+            <div
+              *ngIf="!loadingLastTravel; else loadData"
+              class="text-end pt-1"
             >
-          </div>
-          <div class="text-end pt-1">
-            <h1 class="mb-1"><strong>36h</strong></h1>
-            <p>von 40h</p>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-      <mat-card class="card">
-        <mat-card-content class="card-header">
-          <div
-            class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute"
-          >
-            <mat-icon matListItemIcon class="material-icons opacity-10"
-              >schedule</mat-icon
+              <h1 class="mb-1">
+                <strong>{{ lastTravel?.customer.name }}</strong>
+              </h1>
+              <p>{{ lastTravel?.customer.city }}</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <mat-card class="card">
+          <mat-card-content class="card-header">
+            <div
+              class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute"
             >
-          </div>
-          <div class="text-end pt-1">
-            <h1 class="mb-1"><strong>36h</strong></h1>
-            <p>von 40h</p>
-          </div>
-        </mat-card-content>
-      </mat-card>
+              <mat-icon matListItemIcon class="material-icons opacity-10"
+                >euro_symbol</mat-icon
+              >
+            </div>
+            <div class="text-end pt-1">ausstehender Betrag</div>
+            <div
+              *ngIf="!loadingOpenPayments; else loadData"
+              class="text-end pt-1"
+            >
+              <h1 class="mb-1">
+                <strong>{{ openPaymentValue | currency : "EUR" }}</strong>
+              </h1>
+              <p>von {{ openPaymentCount }} eingereichten Reisen</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <mat-card class="card">
+          <mat-card-content class="card-header">
+            <div
+              class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute"
+            >
+              <mat-icon matListItemIcon class="material-icons opacity-10"
+                >move_to_inbox</mat-icon
+              >
+            </div>
+            <div class="text-end pt-1">nicht eingereichte Reisen</div>
+            <div
+              *ngIf="!loadingUnSubmitted; else loadData"
+              class="text-end pt-1"
+            >
+              <h1 class="mb-1">
+                <strong>{{ unSubmitCount }}</strong>
+              </h1>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
     </div>
   </div>
+
+  <ng-template #loadData>
+    <div class="load-Data">
+      <mat-spinner diameter="25"></mat-spinner>
+    </div>
+  </ng-template>
 </div>

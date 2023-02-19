@@ -1,5 +1,12 @@
 import * as moment from 'moment';
-import { catchError, map, startWith, switchMap, tap } from 'rxjs/operators';
+import {
+  catchError,
+  filter,
+  map,
+  startWith,
+  switchMap,
+  tap,
+} from 'rxjs/operators';
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
@@ -27,13 +34,14 @@ export class WorktimeComponent implements OnInit {
   viewMonth: any;
   date = new FormControl(moment());
   public loading = false;
-  userid = 'ea5eg'; // localStorage.getItem('userId');
+  userid = 'ea5eg'; //'ea5eg'; // localStorage.getItem('userId');
   datesToHighlight = [];
   calcDates = [];
   infoDate: any;
   infoWt: any;
   infoBreak: any;
   workTimes: Worktime[];
+  id = '';
 
   workTimeForm: FormGroup;
 
@@ -43,15 +51,13 @@ export class WorktimeComponent implements OnInit {
     private fb: FormBuilder,
     private dataService: DataServiceService
   ) {
-    this.createWorkTimeForm();
-
     //Dummy
     localStorage.setItem('userId', 'ea5eg');
 
-    this.updateTime();
-    this.createWorktime();
-    this.getWorktime();
-    this.changeSelectedDate();
+    //this.updateTime();
+    //this.createWorktime();
+    //this.getWorktime();
+    //this.changeSelectedDate();
   }
 
   //Getter
@@ -74,12 +80,16 @@ export class WorktimeComponent implements OnInit {
   ngOnInit(): void {
     this.loading = true;
     this.getWorktime();
+    this.createWorkTimeForm();
+    this.updateTime();
   }
 
   submit(event: Event) {
     this.createWorktime();
-    console.log(this.myWorktime);
-    this.dataService.createOrUpdateWorkTime(this.myWorktime);
+    console.log(this.myWorktime, 'SubmitWt');
+    //this.dataService.createOrUpdateWorkTime(this.myWorktime);
+    this.dataService.createWorktime(this.myWorktime);
+    console.log(this.workTimes, 'Dates');
   }
 
   createWorkTimeForm(myWorkTime?: Worktime) {
@@ -161,21 +171,29 @@ export class WorktimeComponent implements OnInit {
   }*/
 
   getWorktime() {
+    this.loading = true;
     this.dataService
       .getWorktimes()
       .snapshotChanges()
       .pipe(
+        tap((dates) => console.log(dates, 'Tap1')),
         map((actions) =>
-          actions.map((a) => {
-            const data = a.payload.doc.data() as Worktime;
-            data.id = a.payload.doc.id;
-            return { ...data };
-          })
+          actions
+            .map((a) => {
+              const data = a.payload.doc.data() as Worktime;
+              data.id = a.payload.doc.id;
+              return { ...data };
+            })
+            .filter((w) => w.userId == this.userid)
         ),
-        tap((dates) => console.log(dates, 'Tap'))
+        tap((dates) => console.log(dates, 'Tap2'))
       )
       .subscribe((dates) => {
         this.workTimes = dates;
+        this.workTimes.forEach((wt) => {
+          this.datesToHighlight.push(wt.date);
+        });
+        this.dateClass();
         this.loading = false;
       });
   }
@@ -184,22 +202,13 @@ export class WorktimeComponent implements OnInit {
     this.infoDate = moment(this.selected).format('MMMM yyyy');
     this.createWorkTimeForm();
     this.calcWorktime(this.calcDates);
-    if (this.calcDates.length > 0) {
-      this.selectedWt = this.calcDates.find(
-        (item: Worktime) => item.date === this.selected.toISOString()
+    if (this.selected !== undefined) {
+      this.myWorktime = this.workTimes.find(
+        (dates) => dates.date == this.selected.toISOString()
       );
-      if (this.selectedWt !== undefined) {
-        this.dataService
-          .getWorkTimeById(this.selectedWt.id)
-          .snapshotChanges()
-          .subscribe((item) => {
-            let x = item.payload.data();
-            x['id'] = item.payload.id;
-            this.myWorktime = x as Worktime;
-            console.log(this.myWorktime, 'MyWorktime');
-            this.createWorkTimeForm(this.myWorktime);
-          });
-      }
+      this.createWorkTimeForm(this.myWorktime);
+      console.log(this.myWorktime, 'MyWorktime');
+      this.updateTime();
     }
   }
 
@@ -225,8 +234,9 @@ export class WorktimeComponent implements OnInit {
     this.infoBreak = Helpers.convertMsToHM(breakTime.asMilliseconds());
   }
 
-  //Setzen der erfassten Tage
+  //Setzen der erfassten Tage im Kalender
   dateClass() {
+    console.log(this.datesToHighlight, 'Highlight');
     return (date: Date): MatCalendarCellCssClasses => {
       const highlightDate = this.datesToHighlight
         .map((strDate) => new Date(strDate))

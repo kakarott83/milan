@@ -15,6 +15,12 @@ export class SidenavComponent implements OnInit {
 
   public sideNacActions = [
     {
+      action: 'home',
+      path: '/business/home',
+      display: 'Dashboard',
+      icon: 'dashboard',
+    },
+    {
       action: 'worktime',
       path: '/business/worktime',
       display: 'Arbeitszeit',

@@ -86,7 +86,7 @@ export class DataServiceService {
   }
 
   createWorktime(worktime: Worktime): any {
-    return this.fsCustomerRef.add({ ...worktime });
+    return this.fsWorktimeRef.add({ ...worktime });
   }
 
   getCustomers(): AngularFirestoreCollection<Customer> {

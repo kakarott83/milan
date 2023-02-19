@@ -32,6 +32,10 @@ span {
   background-clip: border-box;
 }
 
+.card-header {
+  min-height: 130px;
+}
+
 .border-radius-xl {
   border-radius: 0.75rem;
 }
@@ -75,4 +79,9 @@ span {
 
 .opacity-10 {
   opacity: 1 !important;
+}
+
+.load-Data {
+  display: flex;
+  justify-content: center;
 }
