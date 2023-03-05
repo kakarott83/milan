@@ -1,0 +1,17 @@
+<!--input type="file" #fileInput (change)="onFileSelect($event)" />
+<button *ngIf="file" mat-icon-button (click)="upload()">
+  <mat-icon>upload</mat-icon>
+</button>
+<div *ngIf="file">
+  <mat-progress-bar
+    mode="determinate"
+    value="{{ percentage }}"
+  ></mat-progress-bar>
+</div>
+<a href="{{ myUrl }}">{{ myUrl }}</a>
+<div *ngFor="let file of myFiles">Name {{ file.name }}</div-->
+<uploader></uploader>
+<div>
+  Email
+  <button (click)="sendMail()">Senden</button>
+</div>

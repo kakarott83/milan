@@ -56,6 +56,12 @@ export class SidenavComponent implements OnInit {
       display: 'User',
       icon: 'account_circle',
     },
+    {
+      action: 'test',
+      path: '/business/test',
+      display: 'Lab',
+      icon: 'science',
+    },
   ];
 
   constructor(

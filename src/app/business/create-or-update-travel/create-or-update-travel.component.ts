@@ -57,6 +57,7 @@ export class CreateOrUpdateTravelComponent implements OnInit {
   travelId;
   id;
   loading = false;
+  file: File = null;
 
   constructor(
     private router: Router,
@@ -97,6 +98,11 @@ export class CreateOrUpdateTravelComponent implements OnInit {
       type: [spend.type],
       text: [spend.text],
     });
+  }
+
+  upload(event) {
+    this.file = event.target.files[0];
+    console.log(this.file, 'Upload');
   }
 
   isSameCustomer(cust1: Customer, cust2: Customer): boolean {
@@ -282,6 +288,7 @@ export class CreateOrUpdateTravelComponent implements OnInit {
       value: [dates.value],
       type: [dates.type],
       text: [dates.text],
+      file: [''],
     });
   }
 

@@ -1,0 +1,39 @@
+<div
+  class="dropzone"
+  dropzone
+  (hovered)="toggleHover($event)"
+  (dropped)="onDrop($event)"
+  [class.hovering]="isHovering"
+>
+  <h3>File Upload</h3>
+  <p>Drag and Drop a File</p>
+</div>
+
+<h3>Uploads</h3>
+
+<div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Aktion</th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let file of files; let i = index">
+      <tr>
+        <th scope="row">{{ i }}</th>
+        <td>{{ file.name }}</td>
+        <td>
+          <button class="full-width" mat-icon-button (click)="deleteFile(i)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div *ngFor="let file of files">
+  <upload-task [file]="file"></upload-task>
+</div>

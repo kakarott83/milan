@@ -13,12 +13,17 @@ import { CreateOrUpdateCustomerComponent } from './create-or-update-customer/cre
 import { CreateOrUpdateTravelComponent } from './create-or-update-travel/create-or-update-travel.component';
 import { SpendsDialogComponent } from './create-or-update-travel/spendDialog/spends-dialog/spends-dialog.component';
 import { CustomerListComponent } from './customer-list/customer-list.component';
+import { DropzoneDirective } from './dropzone.directive';
+import { FileDropComponent } from './file-drop/file-drop.component';
 import { HomeComponent } from './home/home.component';
+import { LabComponent } from './lab/lab.component';
 import { SpendListComponent } from './spend-list/spend-list.component';
+import { TravelDetailComponent } from './travel-detail/travel-detail.component';
 import { TravelListComponent } from './travel-list/travel-list.component';
+import { UploadTaskComponent } from './upload-task/upload-task.component';
+import { UploaderComponent } from './uploader/uploader.component';
 import { UserComponent } from './user/user.component';
 import { WorktimeComponent } from './worktime/worktime.component';
-import { TravelDetailComponent } from './travel-detail/travel-detail.component';
 
 const routes: Routes = [
   {
@@ -40,6 +45,7 @@ const routes: Routes = [
       },
       { path: 'createCountry', component: CreateOrUpdateCountryComponent },
       { path: 'updateCountry/:id', component: CreateOrUpdateCountryComponent },
+      { path: 'test', component: LabComponent },
     ],
   },
 ];
@@ -61,6 +67,11 @@ const routes: Routes = [
     CreateOrUpdateCountryComponent,
     CountryListComponent,
     TravelDetailComponent,
+    LabComponent,
+    FileDropComponent,
+    DropzoneDirective,
+    UploaderComponent,
+    UploadTaskComponent,
   ],
   imports: [
     CommonModule,

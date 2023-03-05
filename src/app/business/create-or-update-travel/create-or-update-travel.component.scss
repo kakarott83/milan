@@ -56,3 +56,12 @@ span {
   justify-content: center;
   margin-top: 30vh;
 }
+
+#uploadFile {
+  top: 0px;
+  left: 0px;
+  z-index: 9;
+  opacity: 0;
+  cursor: pointer;
+  position: absolute;
+}

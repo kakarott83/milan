@@ -174,7 +174,7 @@
                         </mat-form-field>
                       </div>
 
-                      <div class="col-4">
+                      <div class="col-3">
                         <mat-form-field class="full-width">
                           <mat-label>Kommentar</mat-label>
                           <input
@@ -194,6 +194,21 @@
                           <mat-icon>delete</mat-icon>
                         </button>
                       </div>
+                      <div class="col-1">
+                        <div>
+                          <button class="full-width" mat-icon-button>
+                            <mat-icon>upload</mat-icon>
+                          </button>
+                          <input
+                            type="file"
+                            #fileInput
+                            id="uploadFile"
+                            name="uploadFile"
+                            formControlName="file"
+                            (change)="upload($event)"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -207,6 +222,10 @@
                 <mat-icon>add</mat-icon>Neue Ausgaben
               </button>
             </div>
+          </div>
+          <!--*ngIf="spends.length > 0" -->
+          <div class="row">
+            <uploader></uploader>
           </div>
           <div class="row btn-submit">
             <button
