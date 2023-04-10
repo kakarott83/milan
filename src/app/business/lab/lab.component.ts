@@ -77,9 +77,8 @@ export class LabComponent implements OnInit {
 
       if (file) {
         this.currentFileUpload = new FileUpload(file);
-        this.uploadService
-          .pushToFile(this.currentFileUpload, fileName)
-          .subscribe(
+        this.uploadService.pushToFile(this.currentFileUpload, fileName);
+        /*.subscribe(
             (percentage) => {
               console.log(percentage, 'percentage');
               this.percentage = Math.round(percentage ? percentage : 0);
@@ -87,7 +86,7 @@ export class LabComponent implements OnInit {
             (error) => {
               console.log(error);
             }
-          );
+          );*/
       }
     }
   }

@@ -205,7 +205,6 @@
                             id="uploadFile"
                             name="uploadFile"
                             formControlName="file"
-                            (change)="upload($event)"
                           />
                         </div>
                       </div>
@@ -223,15 +222,47 @@
               </button>
             </div>
           </div>
+          <div class="row">
+            <div>
+              <div>Vorhandene Files</div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Aktion</th>
+                  </tr>
+                </thead>
+                <tbody *ngFor="let file of uploadedFiles; let i = index">
+                  <tr>
+                    <td scope="row">{{ i }}</td>
+                    <td scope="col">
+                      <a href="{{ file.url }}" target="_blank">{{
+                        file.name
+                      }}</a>
+                    </td>
+                    <td scope="col">
+                      <button
+                        class="full-width"
+                        mat-icon-button
+                        (click)="deleteFile(i)"
+                      >
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <!--*ngIf="spends.length > 0" -->
           <div class="row">
-            <uploader></uploader>
+            <uploader (uploadfiles)="addFiles($event)"></uploader>
           </div>
           <div class="row btn-submit">
             <button
               type="submit"
               class="full-width"
-              (click)="submit($event)"
               mat-raised-button
               color="primary"
             >

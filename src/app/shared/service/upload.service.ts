@@ -1,3 +1,11 @@
+import {
+  deleteObject,
+  getDownloadURL,
+  getStorage,
+  listAll,
+  ref,
+  uploadBytes,
+} from 'firebase/storage';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 
@@ -6,7 +14,11 @@ import {
   AngularFireDatabase,
   AngularFireList,
 } from '@angular/fire/compat/database';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+import {
+  AngularFireStorage,
+  AngularFireUploadTask,
+} from '@angular/fire/compat/storage';
 
 import { FileUpload } from '../../models/files';
 
@@ -18,40 +30,56 @@ import { FileUpload } from '../../models/files';
 export class UploadService {
   title = 'TravelFiles';
   downloadURL: Observable<string>;
+  task: AngularFireUploadTask;
+  snapshot: Observable<any>;
+
   url;
   private fileFolder = '/travel';
   constructor(
     private db: AngularFireDatabase,
+    private ds: AngularFirestore,
     private storage: AngularFireStorage
   ) {}
 
   pushToFile(
     fileUpload: FileUpload,
-    fileName: any
-  ): Observable<number | undefined> {
+    fileName: any,
+    travelFolder?: string
+  ): Promise<any> {
     let name = fileName;
+
+    if (travelFolder !== '') {
+      this.fileFolder = '/' + travelFolder;
+    }
+
     const filePath = `${this.fileFolder}/${name}`;
-    const fileRef = this.storage.ref(filePath);
-    const task = this.storage.upload(filePath, fileUpload);
+    /*const fileRef = this.storage.ref(filePath);
+    const task = this.storage.upload(filePath, fileUpload);*/
+    const storage = getStorage();
+    const uploadRef = ref(storage, fileName);
+    const uploadFileRef = ref(storage, filePath);
 
-    task
-      .snapshotChanges()
-      .pipe(
-        tap((data) => console.log(task.percentageChanges(), 'TapService')),
-        finalize(() => {
-          fileRef.getDownloadURL().subscribe((downLoadURL) => {
-            fileUpload.url = downLoadURL;
-            fileUpload.name = fileUpload.file.name;
-            this.saveFileDate(fileUpload);
-          });
-        })
-      )
-      .subscribe();
+    return uploadBytes(uploadFileRef, fileUpload.file).then((snapshot) => {
+      return getDownloadURL(uploadFileRef);
+    });
 
-    return task.percentageChanges();
+    // task
+    //   .snapshotChanges()
+    //   .pipe(
+    //     finalize(async () => {
+    //       await fileRef.getDownloadURL().subscribe((downLoadURL) => {
+    //         fileUpload.url = downLoadURL;
+    //         fileUpload.name = fileUpload.file.name;
+    //         this.saveFileDate(fileUpload);
+    //       });
+    //     })
+    //   )
+    //   .subscribe();
+
+    //return task.percentageChanges();
   }
 
-  private saveFileDate(fileUpload: FileUpload): void {
+  public saveFileDate(fileUpload: FileUpload): void {
     this.db.list(this.fileFolder).push(fileUpload);
   }
 
@@ -63,6 +91,45 @@ export class UploadService {
 
   getFiles(numberItems: number): AngularFireList<FileUpload> {
     return this.db.list(this.fileFolder, (ref) => ref.limitToLast(numberItems));
+  }
+
+  getList(id: string): Promise<any> {
+    const storage = getStorage();
+    const listRef = ref(storage, id);
+
+    return listAll(listRef)
+      .then(async (res) => {
+        let docs = [];
+        const { items } = res;
+        const urls = await Promise.all(
+          items.map((item) => {
+            getDownloadURL(item).then((url) => {
+              console.log(url);
+              let doc = { url: url, name: item.name };
+              docs.push(doc);
+            });
+            //console.log(doc);
+          })
+        );
+        return docs;
+      })
+      .catch((error) => {
+        console.log('keine Items');
+        return error;
+      });
+  }
+
+  deleteFile(file: string) {
+    const storage = getStorage();
+    const desertRef = ref(storage, file);
+
+    deleteObject(desertRef)
+      .then(() => {
+        console.log('File gelöscht');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   private deleteFileDatabase(key: string): Promise<void> {

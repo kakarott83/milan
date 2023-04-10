@@ -36,6 +36,7 @@ export class DataServiceService {
   travelRef: AngularFireObject<any>;
   userListRef: AngularFireList<any>;
   userRef: AngularFireObject<any>;
+  uploadListRef: AngularFireList<any>;
 
   private countriesDbPath = '/countries';
   private customersDbPath = '/customers';
@@ -81,8 +82,10 @@ export class DataServiceService {
     return this.fsCountryRef.add({ ...country });
   }
 
-  createTravel(travel: Travel): any {
-    return this.fsTravelRef.add({ ...travel });
+  async createTravel(travel: Travel): Promise<any> {
+    return await this.fsTravelRef.add(travel).then((docRef) => {
+      return docRef.id;
+    });
   }
 
   createWorktime(worktime: Worktime): any {
@@ -371,6 +374,11 @@ export class DataServiceService {
   getCountryList() {
     this.countryListRef = this.db.list('/countries');
     return this.countryListRef;
+  }
+
+  async getUploadList(id: string) {
+    this.uploadListRef = await this.db.list('/' + id);
+    return this.uploadListRef;
   }
 
   getCustomerList() {

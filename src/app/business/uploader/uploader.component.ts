@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 //https://fireship.io/lessons/angular-firebase-storage-uploads-multi/
 @Component({
@@ -8,6 +8,7 @@ import { Component } from '@angular/core';
 })
 export class UploaderComponent {
   isHovering: boolean;
+  @Output() uploadfiles = new EventEmitter<any[]>();
 
   files: File[] = [];
 
@@ -19,10 +20,16 @@ export class UploaderComponent {
     for (let i = 0; i < files.length; i++) {
       this.files.push(files.item(i));
     }
+    this.pushOutput();
   }
 
   deleteFile(index: number) {
     this.files.splice(index, 1);
     console.log(this.files);
+    this.pushOutput();
+  }
+
+  pushOutput() {
+    this.uploadfiles.emit(this.files);
   }
 }

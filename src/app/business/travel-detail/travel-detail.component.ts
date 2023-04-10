@@ -46,7 +46,7 @@ export class TravelDetailComponent implements OnInit, OnChanges, AfterViewInit {
 
   setTravelValue() {
     if (this.travel !== undefined) {
-      console.log(this.travel, 'SetDetailValue');
+      //console.log(this.travel, 'SetDetailValue');
       this.rate = this.travel.rate;
       this.spendValue = this.travel.spendValue;
       this.total = this.travel.total;

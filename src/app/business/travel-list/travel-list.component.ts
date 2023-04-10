@@ -6,6 +6,7 @@ import {
   startWith,
   switchMap,
   tap,
+  timeout,
 } from 'rxjs/operators';
 
 import { SelectionModel } from '@angular/cdk/collections';
@@ -17,6 +18,7 @@ import { Router } from '@angular/router';
 
 import { Travel } from '../../models/travel';
 import { DataServiceService } from '../../shared/service/data-service.service';
+import { MailService } from '../../shared/service/mail.service';
 
 @Component({
   selector: 'app-travel-list',
@@ -46,7 +48,11 @@ export class TravelListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private router: Router, public dataService: DataServiceService) {}
+  constructor(
+    private router: Router,
+    public dataService: DataServiceService,
+    private mail: MailService
+  ) {}
 
   ngOnInit(): void {}
 
@@ -80,6 +86,7 @@ export class TravelListComponent implements OnInit, AfterViewInit {
 
   submitTravel() {
     console.log(this.selection.selected, 'Selection');
+    this.mail.sendMail(this.selection.selected);
   }
 
   isAllSelected() {
@@ -101,10 +108,12 @@ export class TravelListComponent implements OnInit, AfterViewInit {
               return { ...data };
             })
             .filter((t) => t.userId == this.userId)
-        ),
-        tap((dates) => console.log(dates, 'Tap'))
+        )
+        //timeout(10000),
+        //tap((dates) => console.log(dates, 'Tap'))
       )
       .subscribe((dates) => {
+        //console.error;
         this.travels = dates;
         this.dataSource.data = this.travels;
         this.loading = false;

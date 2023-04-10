@@ -1,5 +1,6 @@
 import { Catering } from './catering';
 import { Customer } from './customer';
+import { Docs } from './doc';
 import { Spend } from './spend';
 
 export interface Travel {
@@ -19,4 +20,5 @@ export interface Travel {
   reason?: string;
   isSubmitted?: boolean;
   isPaid?: boolean;
+  urls?: Docs[];
 }

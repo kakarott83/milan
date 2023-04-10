@@ -1,6 +1,16 @@
+import { list } from 'firebase/storage';
 import * as moment from 'moment';
-import { map, Observable, startWith, tap } from 'rxjs';
+import {
+  from,
+  map,
+  Observable,
+  of as observableOf,
+  startWith,
+  tap,
+} from 'rxjs';
+import { finalize } from 'rxjs/operators';
 import { Customer } from 'src/app/models/customer';
+import { Docs } from 'src/app/models/doc';
 import { Helpers } from 'src/app/shared/material/Helpers';
 import { DataServiceService } from 'src/app/shared/service/data-service.service';
 
@@ -15,8 +25,10 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Catering } from '../../models/catering';
+import { FileUpload } from '../../models/files';
 import { Spend } from '../../models/spend';
 import { Travel } from '../../models/travel';
+import { UploadService } from '../../shared/service/upload.service';
 import { SpendsDialogComponent } from './spendDialog/spends-dialog/spends-dialog.component';
 
 const reasons = ['Vor Ort Betreuung', 'Livegang', 'Präsentation'];
@@ -57,7 +69,12 @@ export class CreateOrUpdateTravelComponent implements OnInit {
   travelId;
   id;
   loading = false;
-  file: File = null;
+  files: File[] = [];
+  urlList: [];
+  state: Observable<any[]>;
+
+  percentage = 0;
+  uploadedFiles: any;
 
   constructor(
     private router: Router,
@@ -66,7 +83,8 @@ export class CreateOrUpdateTravelComponent implements OnInit {
     private dataService: DataServiceService,
     private currencyPipe: CurrencyPipe,
     private datePipe: DatePipe,
-    private activeRoute: ActivatedRoute
+    private activeRoute: ActivatedRoute,
+    private uploadService: UploadService
   ) {
     this.getCustomer();
     this.createTravelForm();
@@ -98,11 +116,6 @@ export class CreateOrUpdateTravelComponent implements OnInit {
       type: [spend.type],
       text: [spend.text],
     });
-  }
-
-  upload(event) {
-    this.file = event.target.files[0];
-    console.log(this.file, 'Upload');
   }
 
   isSameCustomer(cust1: Customer, cust2: Customer): boolean {
@@ -172,9 +185,9 @@ export class CreateOrUpdateTravelComponent implements OnInit {
       this.dataService
         .getTravelById(this.id)
         .valueChanges()
-        .pipe(tap((data) => console.log(data)))
+        //.pipe(tap((data) => console.log(data)))
         .subscribe((item) => {
-          console.log(item, 'Item');
+          //console.log(item, 'Item');
           this.createTravelForm(item);
           this.rate = item.rate;
           this.total = item.total;
@@ -182,18 +195,132 @@ export class CreateOrUpdateTravelComponent implements OnInit {
           this.loading = false;
           this.createMyTravel();
           this.onChanges();
+          /*this.dataService.getUploadList(this.id).then((data) => {
+            this.uploadedFiles = data.valueChanges();
+            this.uploadedFiles.subscribe((data) => {
+              console.log(data);
+            });
+          })*/
+          this.uploadService.getList(this.id).then((docs) => {
+            this.uploadedFiles = docs;
+            console.log(this.uploadedFiles, 'GetList');
+          });
         });
     }
   }
+
+  /*
+  .pipe(
+        map((actions) =>
+          actions.map((a) => {
+            const data = a.payload.doc.data() as Customer;
+            data.id = a.payload.doc.id;
+            return { ...data };
+          })
+        )
+        */
 
   submit(event: any) {
     this.createMyTravel();
     if (this.id) {
       this.dataService.updateTravel(this.id, this.myTravel);
+      if (this.files.length > 0 && this.id !== '') {
+        this.urlList = [];
+        this.files.forEach((element) => {
+          const myFile = new FileUpload(element);
+          this.uploadService.pushToFile(myFile, element.name, this.id);
+          // .subscribe((data) => {
+          //   console.log(data);
+          // });
+        });
+        /*this.uploadService.getList(this.id).then((urls) => {
+          this.myTravel.urls = urls;
+          this.dataService.updateTravel(this.id, this.myTravel);
+        })*/
+      }
     } else {
-      this.dataService.createTravel(this.myTravel);
+      this.dataService.createTravel(this.myTravel).then((id) => {
+        this.myTravel.id = id;
+        if (this.files.length > 0 && this.myTravel.id !== '') {
+          // this.urlList = [];
+          // this.files.forEach(async (element) => {
+          //   const myFile = new FileUpload(element);
+          //   await this.uploadService.pushToFile(
+          //     myFile,
+          //     element.name,
+          //     this.myTravel.id
+          //   );
+          //   // .subscribe((data) => {
+          //   //   console.log(data);
+          //   // });
+          // });
+          this.upload(this.myTravel.id, this.myTravel).then((data) => {
+            console.log(data, 'Data');
+          });
+
+          console.log(this.myTravel.id, 'Id');
+
+          /*this.uploadService.getList(this.myTravel.id).then((urls) => {
+            this.myTravel.urls = urls;
+            this.dataService.updateTravel(this.id, this.myTravel);
+          });*/
+        }
+      });
     }
-    this.router.navigate(['/business/travel-list']);
+    //this.router.navigate(['/business/travel-list']);
+  }
+
+  async upload(id: string, travel: Travel): Promise<any> {
+    let items = [];
+    const promisses = [];
+    await this.files.forEach((element) => {
+      const myFile = new FileUpload(element);
+      promisses.push(
+        this.uploadService.pushToFile(myFile, element.name, id).then((task) => {
+          console.log(task, 'Data was sended');
+          return task;
+        })
+      );
+    });
+    Promise.all(promisses).finally(() => {
+      let urlList: Docs[] = [];
+      // const data1 = { url: 'www.google.com', name: 'test.pdf' };
+      // urlList.push(data1);
+      const url$ = from(this.getUrlList(id));
+      url$
+        .pipe(
+          map((data: Docs[]) => {
+            let list = [];
+            list = data;
+            return list;
+          })
+        )
+        .subscribe((data) => {
+          if (data !== undefined) {
+            let myNewTravel = { ...this.myTravel };
+            myNewTravel.urls = data;
+            myNewTravel.userId = 'FFF';
+            console.log(myNewTravel, 'DataFinish2');
+            console.log(myNewTravel.id, 'DataFinishId');
+            console.log(data[0], 'Length');
+            this.dataService.updateTravel(myNewTravel.id, myNewTravel);
+            if (data.length > 0) {
+              //this.dataService.updateTravel(myNewTravel.id, myNewTravel);
+              console.log('Daten');
+            } else {
+              console.log('keine Daten');
+            }
+          }
+          console.log(data, 'Data');
+          console.log(data.length, 'DataL');
+        });
+    });
+  }
+
+  async getUrlList(id: string): Promise<any> {
+    return await this.uploadService.getList(id).then((urls) => {
+      return urls;
+    });
   }
 
   createMyTravel() {
@@ -257,7 +384,7 @@ export class CreateOrUpdateTravelComponent implements OnInit {
       console.log(this.myTravelForm.value, 'ChangesEvent');
       this.setValue();
       this.createMyTravel();
-      console.log(this.myTravel, 'MyTravel');
+      //console.log(this.myTravel, 'MyTravel');
     });
   }
 
@@ -272,8 +399,8 @@ export class CreateOrUpdateTravelComponent implements OnInit {
             data.id = a.payload.doc.id;
             return { ...data };
           })
-        ),
-        tap((dates) => console.log(dates, 'Tap'))
+        )
+        //tap((dates) => console.log(dates, 'Tap'))
       )
       .subscribe((dates) => {
         this.customerList = dates;
@@ -303,6 +430,16 @@ export class CreateOrUpdateTravelComponent implements OnInit {
 
   removeSpend(i: number) {
     this.spends.removeAt(i);
+  }
+
+  addFiles(event: any) {
+    console.log(event);
+    this.files = [];
+    for (let index = 0; index < event.length; index++) {
+      const element = event[index];
+      this.files.push(element);
+    }
+    console.log(this.files, 'Files');
   }
 
   setValue() {
@@ -367,5 +504,24 @@ export class CreateOrUpdateTravelComponent implements OnInit {
         console.log(this.spends, 'Spends');
       }
     });
+  }
+
+  deleteFile(index) {
+    console.log(index);
+    const file = this.uploadedFiles[index];
+
+    console.log(this.id + '/' + file.name);
+
+    this.uploadService.deleteFile(this.id + '/' + file.name);
+    this.uploadService
+      .getList(this.id)
+      .then((docs) => {
+        this.uploadedFiles = [];
+        this.uploadedFiles = docs;
+        console.log(this.uploadedFiles, 'GetList');
+      })
+      .catch((error) => {
+        console.log('Kein File vorhanden');
+      });
   }
 }
