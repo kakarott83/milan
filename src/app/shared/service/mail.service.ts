@@ -1,11 +1,13 @@
 import * as moment from 'moment';
 import { catchError } from 'rxjs/operators';
+import { Docs } from 'src/app/models/doc';
 import { Travel } from 'src/app/models/travel';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
 import { Injectable } from '@angular/core';
 
+import { NameValidation } from '../../auth/validators';
 import { Spend } from '../../models/spend';
 
 @Injectable({
@@ -27,7 +29,7 @@ export class MailService {
       html: '',
     };
 
-    body.html = this.createHtml(travels, senderName, uploads);
+    body.html = this.createHtml(travels, senderName);
 
     console.log(body, 'sendMailBody');
     // try {
@@ -39,22 +41,19 @@ export class MailService {
     // }
   }
 
-  createHtml(json, senderName, uploads?) {
+  createHtml(json, senderName) {
     console.log(json, 'Json');
-    console.log(uploads, 'Uploads');
 
-    let uploadList = '';
-    if (uploads !== undefined && uploads.lenght > 0) {
-      let items = '';
-      for (let index = 0; index < uploads.length; index++) {
-        const element = uploads[index];
-        items +=
-          '<li><a href="' + element.url + '>' + element.name + '</a></li>';
-      }
-      uploadList = '<ul>' + items + '</ul>';
-    }
-
-    console.log(uploadList, 'UploadList');
+    // let uploadList: json.urls.name;
+    // if (uploadList !== undefined && uploadList.lenght > 0) {
+    //   let items = '';
+    //   for (let index = 0; index < uploadList.length; index++) {
+    //     const element = uploadList[index];
+    //     items +=
+    //       '<li><a href="' + element.url + '>' + element.name + '</a></li>';
+    //   }
+    //   uploadList = '<ul>' + items + '</ul>';
+    // }
 
     let table =
       '<h2>Reisekostenübersicht</h2></br>' +
@@ -68,9 +67,24 @@ export class MailService {
     let subTableSpend = '';
 
     for (let index = 0; index < json.length; index++) {
-      var travel = json[index];
-      const link =
-        'https://firebasestorage.googleapis.com/v0/b/milan-adf44.appspot.com/o/test%2F1677404487899_0340-1650-2012-11-583.pdf?alt=media&token=baa56963-e265-4e79-adce-afc237b08ceb';
+      let travel = json[index];
+      let urls: Docs[] = travel.urls;
+      let urlsText = '';
+      console.log(travel.urls, 'Urls');
+
+      if (urls.length > 0) {
+        urlsText = '<ul>';
+      }
+      for (let index = 0; index < urls.length; index++) {
+        const element = urls[index];
+        urlsText +=
+          '<li><a href="' + element.url + '">' + element.name + '</a></li>';
+      }
+      if (urls.length > 0) {
+        urlsText += '</ul>';
+      }
+
+      console.log(urlsText, 'urlsText');
 
       if (travel.spend.length > 0) {
         subTableSpend =
@@ -118,9 +132,8 @@ export class MailService {
         '</td><td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">' +
         subTableSpend +
         '</td><td style="border: 1px solid #dddddd;text-align: left;padding: 8px;">' +
-        '<a href=' +
-        uploadList +
-        '>Belege</a></td></tr>';
+        urlsText +
+        '</td></tr>';
     }
 
     table += '</table></table></br><p>Schöne Grüße</p></br>' + senderName;

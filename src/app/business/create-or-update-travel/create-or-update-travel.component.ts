@@ -8,7 +8,7 @@ import {
   startWith,
   tap,
 } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { elementAt, finalize } from 'rxjs/operators';
 import { Customer } from 'src/app/models/customer';
 import { Docs } from 'src/app/models/doc';
 import { Helpers } from 'src/app/shared/material/Helpers';
@@ -277,47 +277,34 @@ export class CreateOrUpdateTravelComponent implements OnInit {
       const myFile = new FileUpload(element);
       promisses.push(
         this.uploadService.pushToFile(myFile, element.name, id).then((task) => {
-          console.log(task, 'Data was sended');
           return task;
         })
       );
     });
     Promise.all(promisses).finally(() => {
-      let urlList: Docs[] = [];
       // const data1 = { url: 'www.google.com', name: 'test.pdf' };
-      // urlList.push(data1);
-      const url$ = from(this.getUrlList(id));
-      url$
-        .pipe(
-          map((data: Docs[]) => {
-            let list = [];
-            list = data;
-            return list;
-          })
-        )
-        .subscribe((data) => {
-          if (data !== undefined) {
+
+      const urls$: Docs[] = [];
+      const list$ = this.files.forEach((element) => {
+        console.log(element.name + ' ' + id, 'Name');
+        this.uploadService
+          .getUrlByFile(element.name, id)
+          .pipe(
+            map((url) => {
+              const doc = { url: url, name: element.name };
+              urls$.push(doc);
+            })
+          )
+          .subscribe(() => {
             let myNewTravel = { ...this.myTravel };
-            myNewTravel.urls = data;
-            myNewTravel.userId = 'FFF';
-            console.log(myNewTravel, 'DataFinish2');
-            console.log(myNewTravel.id, 'DataFinishId');
-            console.log(data[0], 'Length');
+            myNewTravel.urls = urls$;
             this.dataService.updateTravel(myNewTravel.id, myNewTravel);
-            if (data.length > 0) {
-              //this.dataService.updateTravel(myNewTravel.id, myNewTravel);
-              console.log('Daten');
-            } else {
-              console.log('keine Daten');
-            }
-          }
-          console.log(data, 'Data');
-          console.log(data.length, 'DataL');
-        });
+          });
+      });
     });
   }
 
-  async getUrlList(id: string): Promise<any> {
+  async getUrlList(id: string): Promise<Docs[]> {
     return await this.uploadService.getList(id).then((urls) => {
       return urls;
     });

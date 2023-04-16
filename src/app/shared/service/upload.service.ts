@@ -20,6 +20,7 @@ import {
   AngularFireUploadTask,
 } from '@angular/fire/compat/storage';
 
+import { Docs } from '../../models/doc';
 import { FileUpload } from '../../models/files';
 
 //https://www.bezkoder.com/angular-11-file-upload-firebase-storage/
@@ -89,22 +90,28 @@ export class UploadService {
     return fileRef.getDownloadURL();
   }
 
+  getUrlByFile(fileName, fileFolder): Observable<string> {
+    const filePath = `${fileFolder}/${fileName}`;
+    const fileRef = this.storage.ref(filePath);
+    return fileRef.getDownloadURL();
+  }
+
   getFiles(numberItems: number): AngularFireList<FileUpload> {
     return this.db.list(this.fileFolder, (ref) => ref.limitToLast(numberItems));
   }
 
-  getList(id: string): Promise<any> {
+  async getList(id: string): Promise<Docs[]> {
     const storage = getStorage();
     const listRef = ref(storage, id);
 
-    return listAll(listRef)
+    return await listAll(listRef)
       .then(async (res) => {
         let docs = [];
         const { items } = res;
         const urls = await Promise.all(
           items.map((item) => {
             getDownloadURL(item).then((url) => {
-              console.log(url);
+              console.log(url, 'UrlFromService');
               let doc = { url: url, name: item.name };
               docs.push(doc);
             });
@@ -116,6 +123,9 @@ export class UploadService {
       .catch((error) => {
         console.log('keine Items');
         return error;
+      })
+      .finally(() => {
+        console.log('Finally');
       });
   }
 
