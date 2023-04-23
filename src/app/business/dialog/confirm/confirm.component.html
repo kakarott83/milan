@@ -1,0 +1,14 @@
+<h1
+  style="font-weight: bold; text-align: center"
+  [style.color]="data.color"
+  mat-dialog-title
+>
+  {{ data.title }}
+</h1>
+<div mat-dialog-content>{{ data.text }}</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog (click)="dialogRef.close('No')">Nein</button>
+  <button mat-button mat-dialog (click)="submit($event)" cdkFocusInitial>
+    Ja
+  </button>
+</div>

@@ -5,4 +5,5 @@ export interface Customer {
   city?: string;
   name?: string;
   country?: Country;
+  icon?: string;
 }

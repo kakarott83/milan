@@ -140,4 +140,27 @@ export class MailService {
 
     return table;
   }
+
+  getToken(): Promise<any> {
+    const header = new Headers({
+      'Content-Type': 'application/json',
+    });
+
+    return fetch('http://localhost:5000/api/auth/token', {
+      method: 'POST',
+      headers: header,
+      body: JSON.stringify({
+        userName: 'johndoe',
+        password: 'password',
+      }),
+    })
+      .then((data) => {
+        console.log(data, 'DataFromService');
+        return data.json();
+      })
+      .catch((error) => {
+        console.log(error, 'Error');
+        return error.json();
+      });
+  }
 }

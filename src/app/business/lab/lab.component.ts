@@ -1,6 +1,7 @@
 import { map } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { FileUpload } from 'src/app/models/files';
+import { MailService } from 'src/app/shared/service/mail.service';
 
 import { Component, OnInit } from '@angular/core';
 import {
@@ -25,8 +26,12 @@ export class LabComponent implements OnInit {
   selectedFiles?: FileList;
   currentFileUpload: FileUpload;
   percentage = 0;
+  token: any;
 
-  constructor(private uploadService: UploadService) {}
+  constructor(
+    private uploadService: UploadService,
+    private mailService: MailService
+  ) {}
 
   ngOnInit(): void {
     console.log('Test');
@@ -92,4 +97,15 @@ export class LabComponent implements OnInit {
   }
 
   sendMail() {}
+
+  getToken() {
+    this.mailService
+      .getToken()
+      .then((response) => {
+        this.token = response.token;
+      })
+      .catch((error) => {
+        console.log(error, 'ErrorUI');
+      });
+  }
 }

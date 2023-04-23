@@ -24,6 +24,7 @@ import { UploadTaskComponent } from './upload-task/upload-task.component';
 import { UploaderComponent } from './uploader/uploader.component';
 import { UserComponent } from './user/user.component';
 import { WorktimeComponent } from './worktime/worktime.component';
+import { ConfirmComponent } from './dialog/confirm/confirm.component';
 
 const routes: Routes = [
   {
@@ -72,6 +73,7 @@ const routes: Routes = [
     DropzoneDirective,
     UploaderComponent,
     UploadTaskComponent,
+    ConfirmComponent,
   ],
   imports: [
     CommonModule,

@@ -209,17 +209,6 @@ export class CreateOrUpdateTravelComponent implements OnInit {
     }
   }
 
-  /*
-  .pipe(
-        map((actions) =>
-          actions.map((a) => {
-            const data = a.payload.doc.data() as Customer;
-            data.id = a.payload.doc.id;
-            return { ...data };
-          })
-        )
-        */
-
   submit(event: any) {
     this.createMyTravel();
     if (this.id) {
@@ -267,7 +256,7 @@ export class CreateOrUpdateTravelComponent implements OnInit {
         }
       });
     }
-    //this.router.navigate(['/business/travel-list']);
+    this.router.navigate(['/business/travel-list']);
   }
 
   async upload(id: string, travel: Travel): Promise<any> {

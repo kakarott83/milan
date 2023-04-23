@@ -10,8 +10,18 @@
 </div>
 <a href="{{ myUrl }}">{{ myUrl }}</a>
 <div *ngFor="let file of myFiles">Name {{ file.name }}</div-->
-<uploader></uploader>
-<div>
-  Email
-  <button (click)="sendMail()">Senden</button>
-</div>
+<mat-tab-group>
+  <mat-tab label="Upload">
+    <uploader></uploader>
+    <div>
+      Email
+      <button (click)="sendMail()">Senden</button>
+    </div>
+  </mat-tab>
+  <mat-tab label="Token">
+    <div>
+      <div>Token: {{ token }}</div>
+      <button mat-raised-button (click)="getToken()">Get Token</button>
+    </div>
+  </mat-tab>
+</mat-tab-group>
