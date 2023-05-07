@@ -11,7 +11,7 @@
                 >schedule</mat-icon
               >
             </div>
-            <div class="text-end pt-1">In dieser Woche bisher gearbeitet</div>
+            <div class="text-end pt-1">Stunden in dieser Woche</div>
             <div *ngIf="!loadingWeekTime; else loadData" class="text-end pt-1">
               <h1 class="mb-1">
                 <strong>{{ weekTimeIs }}h</strong>
@@ -87,6 +87,13 @@
               </h1>
             </div>
           </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xl-6">
+        <mat-card class="card">
+          <app-travel-chart></app-travel-chart>
         </mat-card>
       </div>
     </div>

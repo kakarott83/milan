@@ -55,14 +55,10 @@ export class HomeComponent implements OnInit {
     let currDate = new Date();
     currDate.setHours(0);
     currDate.setMinutes(0);
-    let dur = moment(currDate);
+    let dur = moment.duration('00:00');
     /*Aktuelle Arbeitszeit*/
-    this.dashBoardService.getWorktimePerWeek(this.userid).subscribe((dates) => {
-      dates.forEach((item) => {
-        dur.add(moment(item.duration, 'HH:mm').hours(), 'h');
-        dur.add(moment(item.duration, 'HH:mm').minutes(), 'm');
-      });
-      this.weekTimeIs = dur.format('HH:mm');
+    this.dashBoardService.getWorktimePerWeek(this.userid).subscribe((ws) => {
+      this.weekTimeIs = this.addTime(ws).toString();
       this.loadingWeekTime = false;
     });
   }
@@ -102,5 +98,13 @@ export class HomeComponent implements OnInit {
     this.unSubmitCount = openSubmittedCount;
     this.loadingOpenPayments = false;
     this.loadingUnSubmitted = false;
+  }
+
+  addTime(worktimes: Worktime[]) {
+    let duration = 0;
+    worktimes.forEach((ws) => {
+      duration = duration + moment.duration(ws.duration).as('milliseconds');
+    });
+    return moment.duration(duration).asHours();
   }
 }

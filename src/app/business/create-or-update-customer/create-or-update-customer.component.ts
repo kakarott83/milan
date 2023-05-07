@@ -55,6 +55,10 @@ export class CreateOrUpdateCustomerComponent implements OnInit {
     return this.myCustomerForm.get('city')?.value;
   }
 
+  get icon() {
+    return this.myCustomerForm.get('icon')?.value;
+  }
+
   get selectedCountry() {
     return this.myCustomerForm.get('country')?.value;
   }
@@ -74,6 +78,7 @@ export class CreateOrUpdateCustomerComponent implements OnInit {
       this.myCustomerForm = this.fb.group({
         name: new FormControl(customer.name),
         city: new FormControl(customer.city),
+        icon: new FormControl(customer.icon),
         id: new FormControl({ value: this.id, disabled: true }),
         country: new FormControl(customer.country),
       });
@@ -82,6 +87,7 @@ export class CreateOrUpdateCustomerComponent implements OnInit {
         name: new FormControl(''),
         city: new FormControl(''),
         id: new FormControl(''),
+        icon: new FormControl(''),
         country: [''],
       });
     }
@@ -91,6 +97,7 @@ export class CreateOrUpdateCustomerComponent implements OnInit {
     this.myCustomer = {
       name: this.name,
       city: this.city,
+      icon: this.icon,
       country: this.selectedCountry,
     };
   }

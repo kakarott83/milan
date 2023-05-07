@@ -98,4 +98,21 @@ export class Helpers {
     }
     return false;
   }
+
+  static monthList(): string[] {
+    return [
+      'Januar',
+      'Februar',
+      'März',
+      'April',
+      'Mai',
+      'Juni',
+      'Juli',
+      'August',
+      'September',
+      'Oktober',
+      'November',
+      'Dezember',
+    ];
+  }
 }

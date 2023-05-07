@@ -37,7 +37,7 @@ export class DashboardService {
       : 7 + moment(this.startOfPeriod).isoWeekday() - this.myIsoWeekDay;
 
   // subtract days from start of period
-  begin = moment(this.startOfPeriod).subtract('d', this.daysToSubtract);
+  beginn = moment(this.startOfPeriod).subtract('d', this.daysToSubtract);
 
   getWorktimePerWeek(userId): Observable<Worktime[]> {
     let currDate = new Date();
@@ -48,7 +48,6 @@ export class DashboardService {
       .getWorktimes()
       .snapshotChanges()
       .pipe(
-        tap((dates) => console.log(dates, 'Tap1')),
         map((actions) =>
           actions
             .map((a) => {
@@ -57,17 +56,10 @@ export class DashboardService {
               return { ...data };
             })
             .filter(
-              (w) =>
-                w.userId == userId && moment(w.date).isSameOrAfter(this.begin)
+              (d) =>
+                d.userId == userId && moment(d.date).isSameOrAfter(this.beginn)
             )
-        ),
-        tap((dates) => {
-          dates.forEach((item) => {
-            dur.add(moment(item.duration, 'HH:mm').hours(), 'h');
-            dur.add(moment(item.duration, 'HH:mm').minutes(), 'm');
-          });
-          console.log(dur.format('HH:mm'), 'Tap2');
-        })
+        )
       );
   }
 
@@ -83,9 +75,8 @@ export class DashboardService {
               data.id = a.payload.doc.id;
               return { ...data };
             })
-            .filter((t) => t.userId == userId)
-        ),
-        tap((dates) => console.log(dates, 'Tap'))
+            .filter((d) => d.userId == userId)
+        )
       );
   }
 }

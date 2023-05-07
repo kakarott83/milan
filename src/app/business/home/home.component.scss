@@ -17,6 +17,10 @@ span {
   margin-left: 0;
 }
 
+.row {
+  padding-bottom: 20px;
+}
+
 .content {
   margin-right: auto;
   margin-left: auto;
@@ -30,6 +34,7 @@ span {
   min-width: 0;
   word-wrap: break-word;
   background-clip: border-box;
+  background-color: "#f7f7f7";
 }
 
 .card-header {

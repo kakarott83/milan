@@ -1,0 +1,18 @@
+<div class="travel-chart" id="chart" *ngIf="!loading; else loadData">
+  <apx-chart
+    [series]="chartOptions.series"
+    [chart]="chartOptions.chart"
+    [dataLabels]="chartOptions.dataLabels"
+    [plotOptions]="chartOptions.plotOptions"
+    [yaxis]="chartOptions.yaxis"
+    [xaxis]="chartOptions.xaxis"
+    [fill]="chartOptions.fill"
+    [title]="chartOptions.title"
+  ></apx-chart>
+</div>
+
+<ng-template #loadData>
+  <div class="load-Data">
+    <mat-spinner diameter="25"></mat-spinner>
+  </div>
+</ng-template>
