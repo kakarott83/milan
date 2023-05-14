@@ -1,0 +1,24 @@
+<ng-container>
+  <mat-card class="card" *ngIf="!loading; else loadData">
+    <mat-card-header class="header">
+      <div class="card-buttons">
+        <mat-icon matListItemIcon class="icon">money_off</mat-icon>
+        <mat-icon class="icon-small">open_in_new</mat-icon>
+      </div>
+    </mat-card-header>
+    <mat-card-content class="content">
+      <div class="items col">
+        <p class="item">ausstehender Betrag</p>
+        <h1 class="itemValue">
+          <strong> {{ openPaymentDisplay }} € </strong>
+        </h1>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</ng-container>
+
+<ng-template #loadData>
+  <mat-card class="card load-Data">
+    <mat-spinner diameter="25"></mat-spinner>
+  </mat-card>
+</ng-template>

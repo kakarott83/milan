@@ -1,0 +1,66 @@
+* {
+  box-sizing: border-box;
+}
+
+.container {
+  display: flex;
+  border: 1px solid;
+  height: 100%;
+}
+
+.card {
+  height: 100%;
+  background-image: linear-gradient(to left, orange 40%, white);
+}
+
+.icon {
+  transform: scale(1.5);
+}
+
+.icon-small {
+  transform: scale(1);
+}
+
+.icon-small:hover {
+  cursor: pointer;
+  transform: scale(1.5);
+}
+
+.header {
+  display: flex;
+}
+
+.card-buttons {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.content {
+  width: 100%;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.item {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0;
+}
+
+.itemValue {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+
+.load-Data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}

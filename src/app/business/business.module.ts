@@ -28,6 +28,10 @@ import { UploadTaskComponent } from './upload-task/upload-task.component';
 import { UploaderComponent } from './uploader/uploader.component';
 import { UserComponent } from './user/user.component';
 import { WorktimeComponent } from './worktime/worktime.component';
+import { ItemWorktimeComponent } from './dashboard/item-worktime/item-worktime.component';
+import { ItemLastTravelComponent } from './dashboard/item-last-travel/item-last-travel.component';
+import { ItemOpenAmountComponent } from './dashboard/item-open-amount/item-open-amount.component';
+import { ItemSubmittedTravelComponent } from './dashboard/item-submitted-travel/item-submitted-travel.component';
 
 const routes: Routes = [
   {
@@ -78,6 +82,10 @@ const routes: Routes = [
     UploadTaskComponent,
     ConfirmComponent,
     TravelChartComponent,
+    ItemWorktimeComponent,
+    ItemLastTravelComponent,
+    ItemOpenAmountComponent,
+    ItemSubmittedTravelComponent,
   ],
   imports: [
     CommonModule,

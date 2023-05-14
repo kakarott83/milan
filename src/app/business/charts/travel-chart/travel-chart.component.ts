@@ -95,6 +95,11 @@ export class TravelChartComponent implements OnInit {
         height: 350,
         type: 'bar',
         background: '#f7f7f7',
+        animations: {
+          enabled: true,
+          easing: 'easeout',
+          speed: 800,
+        },
       },
       plotOptions: {
         bar: {
@@ -153,7 +158,7 @@ export class TravelChartComponent implements OnInit {
         },
       },
       title: {
-        text: 'Anzahl Reise',
+        text: 'Anzahl Reise im Jahr',
         floating: true,
         offsetY: 320,
         align: 'center',
@@ -165,6 +170,7 @@ export class TravelChartComponent implements OnInit {
   }
 
   generateMonth() {
+    console.log('Generate Month');
     let list = [];
     for (let index = 0; index < 12; index++) {
       list.push(

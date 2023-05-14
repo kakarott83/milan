@@ -1,4 +1,5 @@
 import * as moment from 'moment';
+import { Subject } from 'rxjs';
 import {
   catchError,
   filter,
@@ -8,12 +9,12 @@ import {
   take,
   tap,
 } from 'rxjs/operators';
+import { Worktime } from 'src/app/models/worktime';
 import { DataServiceService } from 'src/app/shared/service/data-service.service';
 
 import { Component, OnInit } from '@angular/core';
 
 import { Travel } from '../../models/travel';
-import { Worktime } from '../../models/worktime';
 import { Helpers } from '../../shared/material/Helpers';
 import { DashboardService } from '../../shared/service/dashboard.service';
 
@@ -23,8 +24,6 @@ import { DashboardService } from '../../shared/service/dashboard.service';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-  weekTime = 40;
-  weekTimeIs = '';
   loading = false;
   lastTravel: Travel;
   allTravels: Travel[] = [];
@@ -37,6 +36,10 @@ export class HomeComponent implements OnInit {
   openPaymentValue = 0;
   openPaymentCount = 0;
   unSubmitCount = 0;
+  private wsDates = new Subject<Worktime[]>();
+  private travelDates = new Subject<Travel[]>();
+  wsDateObservable = this.wsDates.asObservable();
+  travelDateOberservable = this.travelDates.asObservable();
   //localStorage.setItem('userId', 'ea5eg');
 
   constructor(private dashBoardService: DashboardService) {}
@@ -55,28 +58,18 @@ export class HomeComponent implements OnInit {
     let currDate = new Date();
     currDate.setHours(0);
     currDate.setMinutes(0);
-    let dur = moment.duration('00:00');
     /*Aktuelle Arbeitszeit*/
     this.dashBoardService.getWorktimePerWeek(this.userid).subscribe((ws) => {
-      this.weekTimeIs = this.addTime(ws).toString();
-      this.loadingWeekTime = false;
+      this.wsDates.next(ws);
     });
   }
 
   getTravels() {
     this.dashBoardService.getTravels(this.userid).subscribe((dates) => {
       this.allTravels = dates;
-      this.loadLastTravel();
+      this.travelDates.next(dates);
       this.travelState();
     });
-  }
-
-  loadLastTravel() {
-    this.loadingLastTravel = true;
-    this.lastTravel = this.allTravels.sort((a, b) => {
-      return new Date(a.end).getDate() > new Date(b.end).getDate() ? -1 : 1;
-    })[0];
-    this.loadingLastTravel = false;
   }
 
   travelState() {
@@ -98,13 +91,5 @@ export class HomeComponent implements OnInit {
     this.unSubmitCount = openSubmittedCount;
     this.loadingOpenPayments = false;
     this.loadingUnSubmitted = false;
-  }
-
-  addTime(worktimes: Worktime[]) {
-    let duration = 0;
-    worktimes.forEach((ws) => {
-      duration = duration + moment.duration(ws.duration).as('milliseconds');
-    });
-    return moment.duration(duration).asHours();
   }
 }
